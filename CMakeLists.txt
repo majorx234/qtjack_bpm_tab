@@ -14,17 +14,15 @@ find_package( qtjack REQUIRED)
 
 set(ATTENUATOR_SOURCES src/attenuator.cpp)
 
-#QT5_WRAP_CPP(ATTENUATOR_MOCrcs ${ATTENUATOR_SOURCES})
-
 add_executable(attenuator 
     ${ATTENUATOR_SOURCES}
-#    ${ATTENUATOR_MOCrcs}
 )
 
 target_include_directories(attenuator SYSTEM
-  PUBLIC ${JACK_INCLUDE_DIRS})
+  PUBLIC ${JACK_INCLUDE_DIRS}
+  qtjack::qtjack
+)
 
-message("test ${JACK_LIBRARIES}")
 target_link_libraries(attenuator PRIVATE 
     qtjack::qtjack
     Qt5::Core
