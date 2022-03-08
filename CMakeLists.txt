@@ -29,5 +29,4 @@ target_link_libraries(attenuator PRIVATE
     qtjack::qtjack
     Qt5::Core
     ${JACK_LIBRARIES}
-    /usr/lib/libjackserver.so
 )
