@@ -70,7 +70,14 @@ target_link_libraries(mp3player PRIVATE
 )
 
 ####### Mididial #######
-set(MIDIDIAL_SOURCES src/mididial.cpp)
+set(MIDIDIAL_SOURCES src/mididial.cpp
+                     src/mididial_mainwindow.cpp
+                     include/mididial_mainwindow.h 
+)
+
+QT5_WRAP_CPP(MIDIDIAL_MOCrcs
+            ${MIDIDIAL_SOURCES}
+)
 
 QT5_WRAP_UI(MIDIDIAL_UISrcs 
             ${CMAKE_CURRENT_SOURCE_DIR}/src/mididial.ui)
@@ -78,7 +85,9 @@ QT5_WRAP_UI(MIDIDIAL_UISrcs
 add_executable(mididial
     ${MIDIDIAL_SOURCES}
     ${MIDIDIAL_UISrcs}
+    ${MIDIDIAL_MOCrcs}
 )
+target_include_directories(mididial PRIVATE include)
 target_include_directories(mididial PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(mididial SYSTEM
   PUBLIC 
