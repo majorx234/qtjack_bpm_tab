@@ -103,3 +103,68 @@ target_link_libraries(mididial PRIVATE
     Qt5::Widgets
     ${JACK_LIBRARIES}
 )
+
+####### BPM Tab #######
+set(BPM_TAB_SOURCES src/bpm_tab.cpp
+                    include/bpm_tab.h
+)
+
+set(BPM_TAB_MAIN_SOURCES src/bpm_tab_main.cpp
+)
+
+QT5_WRAP_CPP(BPM_TAB_MOCrcs
+            ${BPM_TAB_SOURCES}
+)
+
+QT5_WRAP_UI(BPM_TAB_UISrcs 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/bpm_tab.ui)
+
+add_library(bpm_tab
+    ${BPM_TAB_SOURCES}
+    ${BPM_TAB_UISrcs}
+    ${BPM_TAB_MOCrcs}
+)
+
+QT5_WRAP_CPP(BPM_TAB_MAIN_MOCrcs
+            ${BPM_TAB_MAIN_SOURCES}
+)
+
+
+target_include_directories(bpm_tab PRIVATE include)
+target_include_directories(bpm_tab PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(bpm_tab SYSTEM
+  PUBLIC 
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Widgets_INCLUDE_DIRS}
+  ${JACK_INCLUDE_DIRS}
+  qtjack::qtjack
+)
+
+target_link_libraries(bpm_tab PRIVATE 
+    qtjack::qtjack
+    Qt5::Core
+    Qt5::Widgets
+    ${JACK_LIBRARIES}
+)
+
+add_executable(bpm_tab_main
+            ${BPM_TAB_MAIN_MOCrcs}
+            ${BPM_TAB_MAIN_SOURCES}
+)
+
+target_include_directories(bpm_tab_main PRIVATE include)
+target_include_directories(bpm_tab_main PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(bpm_tab_main SYSTEM
+  PUBLIC
+  qtjack::qtjack
+  ${JACK_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Widgets_INCLUDE_DIRS}4
+)
+
+target_link_libraries(bpm_tab_main PRIVATE 
+    Qt5::Core
+    Qt5::Widgets
+    qtjack::qtjack
+    bpm_tab
+)
