@@ -1,6 +1,8 @@
 #ifndef BPM_TAB_H_ 
 #define BPM_TAB_H_ 
 
+#include <chrono>
+
 #include <QWidget>
 #include "ui_bpm_tab.h"
 
@@ -21,7 +23,8 @@ public:
 
     void setupJackClient();
     void process(int samples) override;
-
+signals:
+    void setBpm(QString bpm_string);
 protected slots:
     void on_tab_button();
 private:
@@ -29,6 +32,11 @@ private:
     QtJack::Client _client;
     QtJack::MidiPort _midi_out;
     QtJack::MidiBuffer *_midi_out_buffer; //not used yet
+    std::chrono::steady_clock::time_point last_timestamp;
+    bool first_tab;
+    unsigned int max_wait;
+    unsigned int count;
+    double bpm = 0;
 };
 
 #endif // BPM_TAB_H_
