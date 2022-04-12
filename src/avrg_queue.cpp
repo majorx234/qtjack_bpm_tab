@@ -45,3 +45,8 @@ void AvrgQueue::clear() {
   }
 }
 
+void AvrgQueue::holdLast() {
+  double tmp = get_avrg();
+  clear();
+  add_value(tmp);
+}

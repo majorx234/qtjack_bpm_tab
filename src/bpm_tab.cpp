@@ -11,6 +11,7 @@ BpmTab::BpmTab(QWidget *parent)
     , max_wait(60000)
     , bpm(0)
     , count(0)
+    , avrg_queue(8)  
 {
     bpm_tab_ui->setupUi(this);
     connect(this, SIGNAL(setBpm(QString)), this->bpm_tab_ui->bpmLabel, SLOT(setText(QString)));
@@ -36,14 +37,17 @@ void BpmTab::on_tab_button() {
         printf("first\n");
     } else {
         unsigned int milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(new_timestamp - last_timestamp).count();
+        avrg_queue.add_value(milliseconds);
         printf("ms : %d\n",milliseconds );
         if (milliseconds > max_wait) {
             last_timestamp = new_timestamp;
             bpm = 0;
             count = 1;
+            avrg_queue.holdLast();
             return;
         }
-        double bpm_avg = 60000 / (milliseconds);
+        double avrg_milliseconds = avrg_queue.get_avrg();
+        double bpm_avg = 60000 / avrg_milliseconds;
         bpm = int(bpm_avg * 100 + 0.5)/ 100.0;
         count++;
         emit setBpm(QString::number(bpm));

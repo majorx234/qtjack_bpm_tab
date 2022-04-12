@@ -11,6 +11,8 @@
 #include <Processor>
 #include <RingBuffer>
 
+#include "avrg_queue.h"
+
 namespace Ui {
 class BpmTab;
 }
@@ -37,6 +39,7 @@ private:
     unsigned int max_wait;
     unsigned int count;
     double bpm = 0;
+    AvrgQueue avrg_queue;
 };
 
 #endif // BPM_TAB_H_

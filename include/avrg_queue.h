@@ -13,6 +13,7 @@ public:
   bool empty();
   void clear();
   void setMax(unsigned int new_max);
+  void holdLast();
 private:
   std::queue<double> values;
   unsigned int max_elements_;
