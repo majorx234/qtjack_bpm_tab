@@ -105,30 +105,53 @@ target_link_libraries(mididial PRIVATE
 )
 
 ####### BPM Tab #######
-set(BPM_TAB_SOURCES src/bpm_tab.cpp
-                    include/bpm_tab.h
+set(AVRG_QUEUE_SOURCES
+	src/avrg_queue.cpp
+  include/avrg_queue.h
 )
 
-set(BPM_TAB_MAIN_SOURCES src/bpm_tab_main.cpp
+set(AVRG_QUEUE_TEST_SOURCES
+	src/test/avrg_queue_test.cpp)
+
+set(BPM_TAB_SOURCES
+	src/bpm_tab.cpp
+  include/bpm_tab.h
+)
+
+set(BPM_TAB_MAIN_SOURCES
+	src/bpm_tab_main.cpp
 )
 
 QT5_WRAP_CPP(BPM_TAB_MOCrcs
-            ${BPM_TAB_SOURCES}
+  ${BPM_TAB_SOURCES}
 )
 
 QT5_WRAP_UI(BPM_TAB_UISrcs 
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/bpm_tab.ui)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/bpm_tab.ui
+)
 
+add_library(avrg_queue
+    ${AVRG_QUEUE_SOURCES}
+)
+
+target_include_directories(avrg_queue PRIVATE include)
+
+add_executable(avrg_queue_test
+  ${AVRG_QUEUE_TEST_SOURCES}
+)
+target_include_directories(avrg_queue_test PRIVATE include)
+target_link_libraries(avrg_queue_test
+	avrg_queue
+	)
 add_library(bpm_tab
-    ${BPM_TAB_SOURCES}
-    ${BPM_TAB_UISrcs}
-    ${BPM_TAB_MOCrcs}
+  ${BPM_TAB_SOURCES}
+  ${BPM_TAB_UISrcs}
+  ${BPM_TAB_MOCrcs}
 )
 
 QT5_WRAP_CPP(BPM_TAB_MAIN_MOCrcs
             ${BPM_TAB_MAIN_SOURCES}
 )
-
 
 target_include_directories(bpm_tab PRIVATE include)
 target_include_directories(bpm_tab PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -141,15 +164,20 @@ target_include_directories(bpm_tab SYSTEM
 )
 
 target_link_libraries(bpm_tab PRIVATE 
-    qtjack::qtjack
-    Qt5::Core
-    Qt5::Widgets
-    ${JACK_LIBRARIES}
+  qtjack::qtjack
+  Qt5::Core
+  Qt5::Widgets
+  ${JACK_LIBRARIES}
 )
 
 add_executable(bpm_tab_main
-            ${BPM_TAB_MAIN_MOCrcs}
-            ${BPM_TAB_MAIN_SOURCES}
+  ${BPM_TAB_MAIN_MOCrcs}
+  ${BPM_TAB_MAIN_SOURCES}
+)
+
+target_sources(bpm_tab_main
+	PRIVATE ${BPM_TAB_MAIN_MOCrcs}
+  PUBLIC ${BPM_TAB_MAIN_SOURCES}
 )
 
 target_include_directories(bpm_tab_main PRIVATE include)
