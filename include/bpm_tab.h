@@ -2,6 +2,8 @@
 #define BPM_TAB_H_ 
 
 #include <chrono>
+#include <thread>
+#include <atomic>
 
 #include <QWidget>
 #include "ui_bpm_tab.h"
@@ -29,17 +31,27 @@ signals:
     void setBpm(QString bpm_string);
 protected slots:
     void on_tab_button();
+    void on_midi_message_send();
 private:
+    void midi_message_send();
     Ui::BpmTab *bpm_tab_ui;    
     QtJack::Client _client;
     QtJack::MidiPort _midi_out;
     QtJack::MidiBuffer *_midi_out_buffer; //not used yet
+ 
+    // midimessages
+    std::atomic<int> _timestamp_note_on;
+    std::atomic<int> _timestamp_note_off;
+    std::atomic<unsigned int> _value;
+      
     std::chrono::steady_clock::time_point last_timestamp;
     bool first_tab;
     unsigned int max_wait;
     unsigned int count;
     double bpm = 0;
     AvrgQueue avrg_queue;
+    std::thread cyclic_midi_msgs_sender;
+    std::atomic_int alive;
 };
 
 #endif // BPM_TAB_H_
