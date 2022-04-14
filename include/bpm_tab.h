@@ -29,9 +29,10 @@ public:
     void process(int samples) override;
 signals:
     void setBpm(QString bpm_string);
+  void trigger_midi_msg_send(bool);
 protected slots:
     void on_tab_button();
-    void on_midi_message_send();
+    void on_midi_message_send(bool);
 private:
     void midi_message_send();
     Ui::BpmTab *bpm_tab_ui;    
@@ -40,12 +41,13 @@ private:
     QtJack::MidiBuffer *_midi_out_buffer; //not used yet
  
     // midimessages
-    std::atomic<int> _timestamp_note_on;
-    std::atomic<int> _timestamp_note_off;
+    std::atomic<int> _timestamp;
+    std::atomic<bool> _note_on_off;
     std::atomic<unsigned int> _value;
       
     std::chrono::steady_clock::time_point last_timestamp;
     bool first_tab;
+    bool started;
     unsigned int max_wait;
     unsigned int count;
     double bpm = 0;

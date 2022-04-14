@@ -1,5 +1,6 @@
 #include <chrono>
 #include <stdio.h>
+#include <chrono>
 #include <QString>
 #include "bpm_tab.h"
 
@@ -8,20 +9,24 @@ BpmTab::BpmTab(QWidget *parent)
     , Processor(_client)
     , bpm_tab_ui(new Ui::BpmTab)
     , first_tab(true)
+    , started(false)
     , max_wait(5000)
-    , bpm(0)
+    , bpm(120)
     , count(0)
-    , avrg_queue(8)  
+    , avrg_queue(8)
+    , alive(true)
 {
     bpm_tab_ui->setupUi(this);
     setupJackClient();
     connect(this, SIGNAL(setBpm(QString)), this->bpm_tab_ui->bpmLabel, SLOT(setText(QString)));
     connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked, this, &BpmTab::on_tab_button);
-    connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked, this, &BpmTab::on_midi_message_send);
-    //cyclic_midi_msgs_sender = 
+    connect(this, &BpmTab::trigger_midi_msg_send, this, &BpmTab::on_midi_message_send, Qt::QueuedConnection);
+    cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
 }
 
 BpmTab::~BpmTab() {
+  alive = false;
+  cyclic_midi_msgs_sender.join();
 }
 
 void BpmTab::setupJackClient() {
@@ -34,15 +39,26 @@ void BpmTab::setupJackClient() {
 
 void BpmTab::midi_message_send() {
   //thread function
+  while (alive) {
+    if (started) {
+        emit trigger_midi_msg_send(true);
+        std::thread send_node_off = std::thread([this]() {
+          std::this_thread::sleep_for(std::chrono::milliseconds(20));
+          emit trigger_midi_msg_send(false);
+        });    
+        send_node_off.detach();
+    }
+    int ms = 60000 / bpm;
+    //ToDo: need syncing with conditional variable here + timeout
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));    
+  }
 }
-void BpmTab::on_midi_message_send() {
+
+void BpmTab::on_midi_message_send(bool note_on_off) {
+  //ToDo: add midi message to ring buffer
   _value = 127;
-  _timestamp_note_on = _client.getJackFrameTime();
-  double samplerate = _client.getJackSampleRate();
-  //Jack_nframes_t nframes = _timestamp_note_on;
-  //double ms = (nframes * 1000.0) / sameplerate;
-  double offset = 100 *samplerate /1000.0;
-  _timestamp_note_off = _timestamp_note_on + static_cast<int>(offset);
+  _timestamp = _client.getJackFrameTime();
+  _note_on_off = note_on_off;
 }
 
 void BpmTab::process(int samples) {
@@ -51,30 +67,28 @@ void BpmTab::process(int samples) {
   port_buffer.clearEventBuffer();
   last_frame_time = _client.getJackTime();
   unsigned int printvalue = _value;
-  int timestamp_note_on  = _timestamp_note_on;
-  int timestamp_note_off = _timestamp_note_off;
+  int timestamp  = _timestamp;
 
-  int t_on = timestamp_note_on + samples - last_frame_time;
-  int t_off = timestamp_note_off + samples - last_frame_time;
-  if ((t_on > 0) && (t_on < samples)) {
+  int t = _timestamp + samples - last_frame_time;
+
+  if ((t > 0) && (t < samples)) {
 
     //note_on [0x91,0x69,0x3f]
     //note_off [0x81,0x09,0x3f]
     
-    unsigned char midiData_on[3];
-    midiData_on[0] = 0x91;
-    midiData_on[1] = 0x69;
-    midiData_on[2] = 0x3f; // & printvalue;
-    port_buffer.writeEvent(t_on, midiData_on, 3);
-
-    unsigned char midiData_off[3];
-    midiData_off[0] = 0xb1;
-    midiData_off[1] = 10;
-    midiData_off[2] = 0x3f; // & printvalue;
-    port_buffer.writeEvent(t_off, midiData_off, 3);
+    unsigned char midiData[3];
+    if (_note_on_off) {
+      midiData[0] = 0x91;
+      midiData[1] = 0x69;
+      midiData[2] = 0x3f; // & printvalue;
+    } else {
+      midiData[0] = 0x81;
+      midiData[1] = 0x69;
+      midiData[2] = 0x3f; // & printvalue;
+    }
+    port_buffer.writeEvent(t, midiData, 3);
   } 
 }
-
 
 void BpmTab::on_tab_button() {
     printf("button tabed\n");
@@ -99,6 +113,8 @@ void BpmTab::on_tab_button() {
         bpm = int(bpm_avg * 100 + 0.5)/ 100.0;
         count++;
         emit setBpm(QString::number(bpm));
+        if(!started)
+          started = true;
     }
     last_timestamp = new_timestamp;
     return;

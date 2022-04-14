@@ -13,7 +13,7 @@ find_package( Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package( qtjack REQUIRED)
-
+find_package(Threads REQUIRED)
 ####### Attenuator #######
 set(ATTENUATOR_SOURCES src/attenuator.cpp)
 
@@ -180,6 +180,7 @@ target_link_libraries(bpm_tab PRIVATE
   Qt5::Widgets
   ${JACK_LIBRARIES}
   avrg_queue
+	Threads::Threads
 )
 
 add_executable(bpm_tab_main
