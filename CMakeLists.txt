@@ -116,6 +116,11 @@ set(AVRG_QUEUE_TEST_SOURCES
   src/test/avrg_queue_test.cpp
 )
 
+set(WAVE_WIDGET_SOURCES
+	src/wave_widget.cpp
+	include/wave_widget.h
+)
+
 set(BPM_TAB_SOURCES
   src/bpm_tab.cpp
   include/bpm_tab.h
@@ -124,6 +129,11 @@ set(BPM_TAB_SOURCES
 set(BPM_TAB_MAIN_SOURCES
   src/bpm_tab_main.cpp
 )
+
+QT5_WRAP_CPP(WAVE_WIDGET_MOCrcs
+  ${WAVE_WIDGET_SOURCES}
+)
+
 
 QT5_WRAP_CPP(BPM_TAB_MOCrcs
   ${BPM_TAB_SOURCES}
@@ -152,6 +162,23 @@ target_sources(avrg_queue_test
 target_include_directories(avrg_queue_test PRIVATE include)
 target_link_libraries(avrg_queue_test
   avrg_queue
+	)
+
+add_library(wave_widget
+	${WAVE_WIDGET_SOURCES}  
+	${WAVE_WIDGET_MOCrcs}  
+	)
+target_include_directories(wave_widget PRIVATE include)
+target_include_directories(wave_widget PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(wave_widget SYSTEM
+  PUBLIC 
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Widgets_INCLUDE_DIRS}
+)
+
+target_link_libraries(wave_widget PRIVATE 
+  Qt5::Core
+  Qt5::Widgets
 )
 
 add_library(bpm_tab
@@ -180,6 +207,7 @@ target_link_libraries(bpm_tab PRIVATE
   Qt5::Widgets
   ${JACK_LIBRARIES}
   avrg_queue
+	wave_widget
 	Threads::Threads
 )
 

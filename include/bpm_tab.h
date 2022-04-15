@@ -14,6 +14,7 @@
 #include <RingBuffer>
 
 #include "avrg_queue.h"
+#include "wave_widget.h"
 
 namespace Ui {
 class BpmTab;
@@ -35,7 +36,8 @@ protected slots:
     void on_midi_message_send(bool);
 private:
     void midi_message_send();
-    Ui::BpmTab *bpm_tab_ui;    
+    Ui::BpmTab *bpm_tab_ui;
+    WaveWidget* wave_widget;
     QtJack::Client _client;
     QtJack::MidiPort _midi_out;
     QtJack::MidiBuffer *_midi_out_buffer; //not used yet

@@ -17,6 +17,10 @@ BpmTab::BpmTab(QWidget *parent)
     , alive(true)
 {
     bpm_tab_ui->setupUi(this);
+    wave_widget = new WaveWidget(parent);
+    QHBoxLayout *waveHbox = new QHBoxLayout(parent);
+    waveHbox->addWidget(wave_widget);
+    bpm_tab_ui->waveBox->setLayout(waveHbox);
     setupJackClient();
     connect(this, SIGNAL(setBpm(QString)), this->bpm_tab_ui->bpmLabel, SLOT(setText(QString)));
     connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked, this, &BpmTab::on_tab_button);

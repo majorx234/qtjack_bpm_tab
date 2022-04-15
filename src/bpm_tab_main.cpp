@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     bpm_tab_container->setLayout(layout);
 
     bpm_window.setCentralWidget(bpm_tab_container);
-    bpm_window.resize(370,288);
+    bpm_window.resize(420,438);
     bpm_window.show();
     return app.exec();
 }

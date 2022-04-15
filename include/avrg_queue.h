@@ -17,7 +17,6 @@ public:
 private:
   std::queue<double> values;
   unsigned int max_elements_;
-
 };
 
 #endif // AVRG_QUEUE_H_
