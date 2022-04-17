@@ -116,6 +116,11 @@ set(AVRG_QUEUE_TEST_SOURCES
   src/test/avrg_queue_test.cpp
 )
 
+set(SINE_WAVE_SOURCES
+  src/sine_wave.cpp
+	include/sine_wave.h
+)
+
 set(WAVE_WIDGET_SOURCES
 	src/wave_widget.cpp
 	include/wave_widget.h
@@ -163,6 +168,10 @@ target_include_directories(avrg_queue_test PRIVATE include)
 target_link_libraries(avrg_queue_test
   avrg_queue
 	)
+
+add_library(sine_wave
+	${SINE_WAVE_SOURCES})
+target_include_directories(sine_wave PRIVATE include)
 
 add_library(wave_widget
 	${WAVE_WIDGET_SOURCES}  
