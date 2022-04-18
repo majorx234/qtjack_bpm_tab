@@ -25,6 +25,7 @@ BpmTab::BpmTab(QWidget *parent)
     connect(this, SIGNAL(setBpm(QString)), this->bpm_tab_ui->bpmLabel, SLOT(setText(QString)));
     connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked, this, &BpmTab::on_tab_button);
     connect(this, &BpmTab::trigger_midi_msg_send, this, &BpmTab::on_midi_message_send, Qt::QueuedConnection);
+    connect(this, &BpmTab::jack_tick,wave_widget,&WaveWidget::getChunk);
     cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
 }
 
@@ -91,6 +92,7 @@ void BpmTab::process(int samples) {
       midiData[2] = 0x3f; // & printvalue;
     }
     port_buffer.writeEvent(t, midiData, 3);
+    emit jack_tick();
   } 
 }
 

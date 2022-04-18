@@ -2,6 +2,7 @@
 #include <QColor>
 #include <QResizeEvent>
 #include "wave_widget.h"
+#include "sine_wave.h"
 
 WaveWidget::WaveWidget(QWidget *parent) {
   setMinimumSize(400,100);
@@ -14,10 +15,12 @@ WaveWidget::WaveWidget(QWidget *parent) {
   }
   wave_ofs_ = 0;
   wavecounter_ = 0;
+  frame_rate = 25.0;
 }
 
 WaveWidget::~WaveWidget() {
-  
+  for (int i = 0; i < 4; i++)
+    delete wave_[i];
 
 }
 
@@ -49,12 +52,13 @@ void WaveWidget::getChunk() {
   for (int i = 0; i < 4; i++)
     wave_[i][wave_ofs_] = 0; //ToDo:data->limits[i];
   wave_ofs_++;
-  if (wave_ofs_ >= width()) wave_ofs_ = 0;
-  /* Todo
-    if (waveCounter++ >= (double)data->getRate() / (FRAME_RATE * (double)data->getJackBufSize())) {
-    waveCounter = 0;
+  if (wave_ofs_ >= width())
+    wave_ofs_ = 0;
+  // Todo
+  if (wavecounter_++ >= 48000.0 / (25.0 * (double)1024.0)) {
+    wavecounter_ = 0;
     repaint();
-    }  */
+    }
 }
 
 
