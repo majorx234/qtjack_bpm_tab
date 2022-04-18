@@ -30,7 +30,8 @@ public:
     void process(int samples) override;
 signals:
     void setBpm(QString bpm_string);
-  void trigger_midi_msg_send(bool);
+    void trigger_midi_msg_send(bool);
+    void jack_tick();
 protected slots:
     void on_tab_button();
     void on_midi_message_send(bool);
