@@ -2,6 +2,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <QMainWindow>
+#include "wave_widget.h"
 
 void catchUnixSignal(int quitSignal) {
   auto handler = [](int sig) -> void {
@@ -27,6 +28,8 @@ int main(int argc, char *argv[]) {
   catchUnixSignal(SIGINT);
 
   QMainWindow main_window;
+  WaveWidget wave_widget(&main_window);
+  main_window.setCentralWidget(&wave_widget);
   main_window.show();
   
   return app.exec();
