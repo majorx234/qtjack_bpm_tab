@@ -136,6 +136,8 @@ set(BPM_TAB_MAIN_SOURCES
 )
 
 set(WAVE_WIDGET_TEST_SOURCES
+	include/test/main_window_test.h
+	src/test/main_window_test.cpp
   src/test/wave_widget_test.cpp
 )
 
@@ -195,6 +197,7 @@ target_include_directories(wave_widget SYSTEM
 target_link_libraries(wave_widget PRIVATE 
   Qt5::Core
   Qt5::Widgets
+	sine_wave
 )
 
 add_executable(wave_widget_test
@@ -209,9 +212,7 @@ target_link_libraries(wave_widget_test
   wave_widget
 	Qt5::Core
   Qt5::Widgets
-	)
-
-
+)
 
 add_library(bpm_tab
   ${BPM_TAB_SOURCES}

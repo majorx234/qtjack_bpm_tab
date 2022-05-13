@@ -1,8 +1,8 @@
 #include <QtWidgets/QApplication>
 #include <signal.h>
 #include <unistd.h>
-#include <QMainWindow>
-#include "wave_widget.h"
+
+#include "test/main_window_test.h"
 
 void catchUnixSignal(int quitSignal) {
   auto handler = [](int sig) -> void {
@@ -27,9 +27,8 @@ int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
   catchUnixSignal(SIGINT);
 
-  QMainWindow main_window;
-  WaveWidget wave_widget(&main_window);
-  main_window.setCentralWidget(&wave_widget);
+  MainWindowTest main_window;
+  
   main_window.show();
   
   return app.exec();

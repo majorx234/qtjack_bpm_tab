@@ -49,8 +49,25 @@ void WaveWidget::resizeEvent(QResizeEvent *ev) {
 }
 
 void WaveWidget::getChunk() {
+  // <test code>
+  double data[1024];
+  sine_wave(data, 1000, 1, 1024, 1014*wave_ofs_, 48000);
+
+  double limits[4] = {0.0, 0.0, 0.0, 0.0};
+
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 1024; j++) {
+      if(data[j] < limits[2*i])
+        limits[2*i] = data[j];
+      else if (data[j] > limits[2 * i + 1]) {
+        limits[2*i+1] = data[j];
+      }
+    }
+  }
+
+  // </test code>
   for (int i = 0; i < 4; i++)
-    wave_[i][wave_ofs_] = 0; //ToDo:data->limits[i];
+    wave_[i][wave_ofs_] = limits[i];
   wave_ofs_++;
   if (wave_ofs_ >= width())
     wave_ofs_ = 0;
