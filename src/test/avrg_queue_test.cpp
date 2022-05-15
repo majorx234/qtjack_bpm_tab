@@ -1,5 +1,5 @@
 #include "avrg_queue.h"
-#include <cstdio>>
+#include <cstdio>
 
 int main(int argc, char *argv[]) {
   AvrgQueue test_queue(8);
