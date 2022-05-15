@@ -25,7 +25,7 @@ BpmTab::BpmTab(QWidget *parent)
     connect(this, SIGNAL(setBpm(QString)), this->bpm_tab_ui->bpmLabel, SLOT(setText(QString)));
     connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked, this, &BpmTab::on_tab_button);
     connect(this, &BpmTab::trigger_midi_msg_send, this, &BpmTab::on_midi_message_send, Qt::QueuedConnection);
-    connect(this, &BpmTab::jack_tick,wave_widget,&WaveWidget::getChunk);
+    //    connect(this, &BpmTab::jack_tick,wave_widget,&WaveWidget::getChunk);
     cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
 }
 
@@ -36,8 +36,14 @@ BpmTab::~BpmTab() {
 
 void BpmTab::setupJackClient() {
   _client.connectToServer("BpmTab");
+  // midi port
   _midi_out = _client.registerMidiOutPort("out_1");
   _midi_out_buffer = new QtJack::MidiBuffer(); //not used yet
+
+  // audio port
+  _audio_in_port = _client.registerAudioInPort("in");
+  _audio_ring_buffer = QtJack::AudioRingBuffer();
+  
   _client.setMainProcessor(this);
   _client.activate();
 }
@@ -67,6 +73,7 @@ void BpmTab::on_midi_message_send(bool note_on_off) {
 }
 
 void BpmTab::process(int samples) {
+  // midi part
   jack_nframes_t last_frame_time;
   QtJack::MidiBuffer port_buffer = _midi_out.buffer(samples);
   port_buffer.clearEventBuffer();
@@ -93,9 +100,25 @@ void BpmTab::process(int samples) {
     }
     port_buffer.writeEvent(t, midiData, 3);
     emit jack_tick();
-  } 
+  }
+  //audio part
+  _audio_in_port.buffer(samples).push(_audio_ring_buffer);
 }
 
+void BpmTab::audio_process_fct() {
+    
+    while(alive)
+    {
+        std::unique_lock<std::mutex> lock(audio_mutex);
+        // ToDo: timeout shoul be a class member 
+        int timeInMillisec = 1000; 
+        while(audio_chunk_cv.wait_for(lock,std::chrono::milliseconds(timeInMillisec))==std::cv_status::timeout){
+            if(!alive) return;
+            //do stuff
+            int num_elements = _audio_ring_buffer.numberOfElementsAvailableForRead();
+        }
+    }    
+}
 void BpmTab::on_tab_button() {
     printf("button tabed\n");
     std::chrono::steady_clock::time_point new_timestamp = std::chrono::steady_clock::now();

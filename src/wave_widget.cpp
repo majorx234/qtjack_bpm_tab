@@ -43,7 +43,6 @@ void WaveWidget::paintEvent(QPaintEvent *) {
   p.end();
 }
 
-
 void WaveWidget::resizeEvent(QResizeEvent *ev) {
   
 }

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <condition_variable>
 
 #include <QWidget>
 #include "ui_bpm_tab.h"
@@ -28,6 +29,7 @@ public:
 
     void setupJackClient();
     void process(int samples) override;
+    void audio_process_fct();
 signals:
     void setBpm(QString bpm_string);
     void trigger_midi_msg_send(bool);
@@ -42,6 +44,8 @@ private:
     QtJack::Client _client;
     QtJack::MidiPort _midi_out;
     QtJack::MidiBuffer *_midi_out_buffer; //not used yet
+    QtJack::AudioPort _audio_in_port;
+    QtJack::AudioRingBuffer _audio_ring_buffer;
  
     // midimessages
     std::atomic<int> _timestamp;
@@ -56,7 +60,10 @@ private:
     double bpm = 0;
     AvrgQueue avrg_queue;
     std::thread cyclic_midi_msgs_sender;
+    std::thread audio_processing;
     std::atomic_int alive;
+    std::condition_variable audio_chunk_cv;
+    std::mutex audio_mutex;
 };
 
 #endif // BPM_TAB_H_
