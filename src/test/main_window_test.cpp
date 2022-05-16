@@ -14,5 +14,5 @@ MainWindowTest::~MainWindowTest() {
 }
 
 void MainWindowTest::timerEvent(QTimerEvent *event) {
-    wave_widget.getChunk();
+    wave_widget.testChunk();
 }

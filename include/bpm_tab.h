@@ -46,6 +46,9 @@ private:
     QtJack::MidiBuffer *_midi_out_buffer; //not used yet
     QtJack::AudioPort _audio_in_port;
     QtJack::AudioRingBuffer _audio_ring_buffer;
+    size_t _audio_buffer_size;
+    QtJack::AudioSample* _audio_buffer;
+    size_t _new_samples_in_audio_buffer;
  
     // midimessages
     std::atomic<int> _timestamp;

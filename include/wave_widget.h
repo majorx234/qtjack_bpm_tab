@@ -12,7 +12,8 @@ public:
   ~WaveWidget();
 
 public slots:
-  void getChunk();
+  void setChunk(double limit_1high,double limit_1low,double limit_2high,double limit_2low);
+  void testChunk();
 
 private:
   double *wave_[4];

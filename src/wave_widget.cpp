@@ -46,8 +46,18 @@ void WaveWidget::paintEvent(QPaintEvent *) {
 void WaveWidget::resizeEvent(QResizeEvent *ev) {
   
 }
+void WaveWidget::setChunk(double limit_1high,double limit_1low,double limit_2high,double limit_2low) {
+  wave_[0][wave_ofs_] = limit_1high;
+  wave_[1][wave_ofs_] = limit_1low;
+  wave_[2][wave_ofs_] = limit_2high;
+  wave_[3][wave_ofs_] = limit_2low;
+  wave_ofs_++;
+  if (wave_ofs_ >= width())
+    wave_ofs_ = 0;
+  repaint();
+}
 
-void WaveWidget::getChunk() {
+void WaveWidget::testChunk() {
   // <test code>
   double data[1024];
   sine_wave(data, 1000, 1, 1024, 1014*wave_ofs_, 48000);
@@ -56,9 +66,9 @@ void WaveWidget::getChunk() {
 
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 1024; j++) {
-      if(data[j] < limits[2*i])
+      if(data[j] < limits[2*i]) {
         limits[2*i] = data[j];
-      else if (data[j] > limits[2 * i + 1]) {
+      } else if (data[j] > limits[2 * i + 1]) {
         limits[2*i+1] = data[j];
       }
     }

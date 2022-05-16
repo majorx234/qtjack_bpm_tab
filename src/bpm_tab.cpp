@@ -15,7 +15,10 @@ BpmTab::BpmTab(QWidget *parent)
     , count(0)
     , avrg_queue(8)
     , alive(true)
+    , _audio_buffer_size(48000*30) // 30seconds audiobuffer
+    , _new_samples_in_audio_buffer(0)
 {
+  _audio_buffer = (QtJack::AudioSample*)malloc(_audio_buffer_size*sizeof(QtJack::AudioSample));
     bpm_tab_ui->setupUi(this);
     wave_widget = new WaveWidget(parent);
     QHBoxLayout *waveHbox = new QHBoxLayout(parent);
@@ -32,6 +35,7 @@ BpmTab::BpmTab(QWidget *parent)
 BpmTab::~BpmTab() {
   alive = false;
   cyclic_midi_msgs_sender.join();
+  delete _audio_buffer;
 }
 
 void BpmTab::setupJackClient() {
@@ -106,17 +110,23 @@ void BpmTab::process(int samples) {
 }
 
 void BpmTab::audio_process_fct() {
-    
+    int max_elemets = _audio_buffer_size;
     while(alive)
     {
-        std::unique_lock<std::mutex> lock(audio_mutex);
-        // ToDo: timeout shoul be a class member 
-        int timeInMillisec = 1000; 
-        while(audio_chunk_cv.wait_for(lock,std::chrono::milliseconds(timeInMillisec))==std::cv_status::timeout){
-            if(!alive) return;
-            //do stuff
-            int num_elements = _audio_ring_buffer.numberOfElementsAvailableForRead();
+        {
+            std::unique_lock<std::mutex> lock(audio_mutex);
+            // ToDo: timeout shoul be a class member
+            int timeInMillisec = 1000;
+            while(audio_chunk_cv.wait_for(lock,std::chrono::milliseconds(timeInMillisec))==std::cv_status::timeout){
+                if(!alive) return;
+                //do stuff
+                int num_elements = _audio_ring_buffer.numberOfElementsAvailableForRead();
+                //need to copy, not more than buffer size
+                max_elemets = num_elements < _audio_buffer_size ? num_elements : _audio_buffer_size;
+                _audio_ring_buffer.read(_audio_buffer, max_elemets);
+            } //read in finished
         }
+        // Process read data
     }    
 }
 void BpmTab::on_tab_button() {
