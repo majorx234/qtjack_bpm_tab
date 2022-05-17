@@ -24,7 +24,7 @@ WaveWidget::~WaveWidget() {
 
 }
 
-void WaveWidget::paintEvent(QPaintEvent *) {
+void WaveWidget::paintEvent(QPaintEvent *event) {
   QPainter p;
 
   int w = width();
@@ -59,10 +59,10 @@ void WaveWidget::setChunk(double limit_1high,double limit_1low,double limit_2hig
 
 void WaveWidget::testChunk() {
   // <test code>
-  double data[1024];
+  float data[1024];
   sine_wave(data, 1000, 1, 1024, 1014*wave_ofs_, 48000);
 
-  double limits[4] = {0.0, 0.0, 0.0, 0.0};
+  float limits[4] = {0.0, 0.0, 0.0, 0.0};
 
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 1024; j++) {
