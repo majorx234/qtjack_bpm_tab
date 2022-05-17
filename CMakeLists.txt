@@ -104,6 +104,43 @@ target_link_libraries(mididial PRIVATE
     ${JACK_LIBRARIES}
 )
 
+####### Sinedial #######
+set(SINEDIAL_SOURCES src/sinedial.cpp
+                     src/sinedial_mainwindow.cpp
+                     include/sinedial_mainwindow.h
+)
+
+QT5_WRAP_CPP(SINEDIAL_MOCrcs
+            ${SINEDIAL_SOURCES}
+)
+
+QT5_WRAP_UI(SINEDIAL_UISrcs
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/sinedial.ui)
+
+add_executable(sinedial
+    ${SINEDIAL_SOURCES}
+    ${SINEDIAL_UISrcs}
+    ${SINEDIAL_MOCrcs}
+)
+target_include_directories(sinedial PRIVATE include)
+target_include_directories(sinedial PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(sinedial SYSTEM
+  PUBLIC
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Widgets_INCLUDE_DIRS}
+  ${JACK_INCLUDE_DIRS}
+  qtjack::qtjack
+)
+
+target_link_libraries(sinedial PRIVATE
+    qtjack::qtjack
+    Qt5::Core
+    Qt5::Widgets
+    ${JACK_LIBRARIES}
+		sine_wave
+)
+
+
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp
