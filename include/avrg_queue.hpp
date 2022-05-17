@@ -1,5 +1,5 @@
-#ifndef AVRG_QUEUE_H_
-#define AVRG_QUEUE_H_
+#ifndef AVRG_QUEUE_HPP_
+#define AVRG_QUEUE_HPP_
 
 #include <queue>
 
@@ -19,4 +19,4 @@ private:
   unsigned int max_elements_;
 };
 
-#endif // AVRG_QUEUE_H_
+#endif // AVRG_QUEUE_HPP_

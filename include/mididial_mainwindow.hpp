@@ -1,28 +1,29 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //
-//    This file is part of QtJack.                                            //
+//    This file is part of QtJack.                                           //
 //    Copyright (C) 2014-2015 Jacob Dawid <jacob@omg-it.works>               //
-//                                                                           //
-//    QtJack is free software: you can redistribute it and/or modify          //
+//                  2022 <majorx234@googlemail.com>                          //
+//    QtJack is free software: you can redistribute it and/or modify         //
 //    it under the terms of the GNU General Public License as published by   //
 //    the Free Software Foundation, either version 3 of the License, or      //
 //    (at your option) any later version.                                    //
 //                                                                           //
-//    QtJack is distributed in the hope that it will be useful,               //
+//    QtJack is distributed in the hope that it will be useful,              //
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of         //
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          //
 //    GNU General Public License for more details.                           //
 //                                                                           //
 //    You should have received a copy of the GNU General Public License      //
-//    along with QtJack. If not, see <http://www.gnu.org/licenses/>.          //
+//    along with QtJack. If not, see <http://www.gnu.org/licenses/>.         //
 //                                                                           //
-//    It is possible to obtain a closed-source license of QtJack.             //
+//    It is possible to obtain a closed-source license of QtJack.            //
 //    If you're interested, contact me at: jacob@omg-it.works                //
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef MP3PLAYER_MAINWINDOW_H
-#define MP3PLAYER_MAINWINDOW_H
+#ifndef MIDIDIAL_MAINWINDOW_HPP
+#define MIDIDIAL_MAINWINDOW_HPP
+#include <atomic>
 
 // QtJack includes
 #include <Client>
@@ -31,44 +32,42 @@
 
 // Qt includes
 #include <QMainWindow>
-#include <QAudioDecoder>
+#include "ui_mididial.h"
+
+// Midi stuff
+struct midiMessage {
+  unsigned char midiData[3];
+  int length;
+  jack_nframes_t timestamp;
+};
 
 namespace Ui {
-class Mp3PlayerMainWindow;
+class Mididial;
 }
 
-class Mp3PlayerMainWindow : public QMainWindow, public QtJack::Processor
+class MidiDialMainWindow : public QMainWindow, public QtJack::Processor
 {
     Q_OBJECT
 
 public:
-    explicit Mp3PlayerMainWindow(QWidget *parent = 0);
-    ~Mp3PlayerMainWindow();
+    explicit MidiDialMainWindow(QWidget *parent = 0);
+    ~MidiDialMainWindow();
 
     void setupJackClient();
-    void setupMp3Decoder();
-    void process(int samples);
+    void process(int samples) override;
 
 protected slots:
-    void on_toolButtonFileChoose_clicked();
-
-    void decodingError(QAudioDecoder::Error error);
-    void transferSamples();
-
-protected:
-    void timerEvent(QTimerEvent*);
+    void on_twist();
 
 private:
-    Ui::Mp3PlayerMainWindow *ui;
-
-    QAudioDecoder _audioDecoder;
+    Ui::Mididial *mididial_ui;
 
     QtJack::Client _client;
-    QtJack::AudioPort _outLeft;
-    QtJack::AudioPort _outRight;
-
-    QtJack::AudioRingBuffer _ringBufferLeft;
-    QtJack::AudioRingBuffer _ringBufferRight;
+    QtJack::MidiPort _midi_out;
+    QtJack::MidiBuffer *_midi_out_buffer; //not used yet
+    QAbstractSlider *slider;
+    std::atomic<unsigned int> _value;
+    std::atomic<int> _timestamp;
 };
 
-#endif // MP3PLAYER_MAINWINDOW_H
+#endif // MIDIDIAL_MAINWINDOW_HPP

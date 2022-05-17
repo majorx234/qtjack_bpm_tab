@@ -1,4 +1,4 @@
-#include "avrg_queue.h"
+#include "avrg_queue.hpp"
 
 AvrgQueue::AvrgQueue(unsigned int max_elements)
     : max_elements_(max_elements)
@@ -6,7 +6,7 @@ AvrgQueue::AvrgQueue(unsigned int max_elements)
 }
 
 AvrgQueue::~AvrgQueue() {
-  
+
 }
 
 double AvrgQueue::get_avrg() {
@@ -35,7 +35,7 @@ void AvrgQueue::add_value(double new_value) {
 }
 
 bool AvrgQueue::empty() {
-  return values.empty();  
+  return values.empty();
 }
 
 void AvrgQueue::clear() {

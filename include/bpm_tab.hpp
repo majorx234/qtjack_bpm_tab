@@ -1,5 +1,5 @@
-#ifndef BPM_TAB_H_ 
-#define BPM_TAB_H_ 
+#ifndef BPM_TAB_H_
+#define BPM_TAB_H_
 
 #include <chrono>
 #include <thread>
@@ -14,8 +14,8 @@
 #include <Processor>
 #include <RingBuffer>
 
-#include "avrg_queue.h"
-#include "wave_widget.h"
+#include "avrg_queue.hpp"
+#include "wave_widget.hpp"
 
 namespace Ui {
 class BpmTab;
@@ -49,12 +49,13 @@ private:
     size_t _audio_buffer_size;
     QtJack::AudioSample* _audio_buffer;
     size_t _new_samples_in_audio_buffer;
- 
+
+
     // midimessages
     std::atomic<int> _timestamp;
     std::atomic<bool> _note_on_off;
     std::atomic<unsigned int> _value;
-      
+
     std::chrono::steady_clock::time_point last_timestamp;
     bool first_tab;
     bool started;

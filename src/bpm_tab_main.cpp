@@ -1,7 +1,7 @@
 #include <QtWidgets/QApplication>
 #include <QMainWindow>
 #include <QLayout>
-#include "bpm_tab.h"
+#include "bpm_tab.hpp"
 
 int main(int argc, char **argv) {
     QApplication app(argc, argv);

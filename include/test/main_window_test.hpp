@@ -2,7 +2,7 @@
 #define MAIN_WINDOW_TEST_H_
 
 #include <QMainWindow>
-#include "wave_widget.h"
+#include "wave_widget.hpp"
 
 class MainWindowTest : public QMainWindow
 {

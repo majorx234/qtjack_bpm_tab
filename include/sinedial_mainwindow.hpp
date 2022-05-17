@@ -21,8 +21,8 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef SINEDIAL_MAINWINDOW_H
-#define SINEDIAL_MAINWINDOW_H
+#ifndef SINEDIAL_MAINWINDOW_HPP_
+#define SINEDIAL_MAINWINDOW_HPP_
 
 #include <atomic>
 #include <thread>
@@ -59,7 +59,7 @@ private:
 
     QtJack::Client _client;
     QtJack::AudioPort _audio_out[2];
-    QtJack::AudioRingBuffer *_audio_ring_buffer[2]; 
+    QtJack::AudioRingBuffer *_audio_ring_buffer[2];
     QAbstractSlider *slider_base_freq;
     QAbstractSlider *slider_mod_freq;
     std::atomic<unsigned int> _value_base_freq;
@@ -74,4 +74,4 @@ private:
     QtJack::AudioSample* right;
 };
 
-#endif // SINEDIAL_MAINWINDOW_H
+#endif // SINEDIAL_MAINWINDOW_HPP_

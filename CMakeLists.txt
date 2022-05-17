@@ -33,15 +33,16 @@ target_link_libraries(attenuator PRIVATE
 )
 
 ####### MP3 Player #######
-set(MP3PLAYER_SOURCES src/mp3player.cpp
-                      src/mp3player_mainwindow.cpp
-                      include/mp3player_mainwindow.h)
+set(MP3PLAYER_SOURCES
+  src/mp3player.cpp
+  src/mp3player_mainwindow.cpp
+  include/mp3player_mainwindow.hpp)
 
 QT5_WRAP_UI(MP3PLAYER_MAINWINDOW_UISrcs
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/mp3player_mainwindow.ui)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/mp3player_mainwindow.ui)
 
 QT5_WRAP_CPP(MP3PLAYER_MOCrcs
-            ${MP3PLAYER_SOURCES}
+  ${MP3PLAYER_SOURCES}
 )
 
 add_executable(mp3player
@@ -64,32 +65,32 @@ target_include_directories(mp3player SYSTEM
 )
 
 target_link_libraries(mp3player PRIVATE
-    qtjack::qtjack
-    Qt5::Core
-    Qt5::Widgets
-    Qt5::Multimedia
-    ${JACK_LIBRARIES}
+  qtjack::qtjack
+  Qt5::Core
+  Qt5::Widgets
+  Qt5::Multimedia
+  ${JACK_LIBRARIES}
 )
 
 ####### Mididial #######
 set(MIDIDIAL_SOURCES src/mididial.cpp
-                     src/mididial_mainwindow.cpp
-                     include/mididial_mainwindow.h
+  src/mididial_mainwindow.cpp
+  include/mididial_mainwindow.hpp
 )
 
 QT5_WRAP_CPP(MIDIDIAL_MOCrcs
-            ${MIDIDIAL_SOURCES}
+  ${MIDIDIAL_SOURCES}
 )
 
 QT5_WRAP_UI(MIDIDIAL_UISrcs
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/mididial.ui)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/mididial.ui)
 
 add_executable(mididial)
 target_sources(mididial
   PRIVATE
-    ${MIDIDIAL_SOURCES}
-    ${MIDIDIAL_UISrcs}
-    ${MIDIDIAL_MOCrcs}
+  ${MIDIDIAL_SOURCES}
+  ${MIDIDIAL_UISrcs}
+  ${MIDIDIAL_MOCrcs}
 )
 target_include_directories(mididial PRIVATE include)
 target_include_directories(mididial PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -101,31 +102,32 @@ target_include_directories(mididial SYSTEM
   qtjack::qtjack
 )
 target_link_libraries(mididial PRIVATE
-    qtjack::qtjack
-    Qt5::Core
-    Qt5::Widgets
-    ${JACK_LIBRARIES}
+  qtjack::qtjack
+  Qt5::Core
+  Qt5::Widgets
+  ${JACK_LIBRARIES}
 )
 
 ####### Sinedial #######
-set(SINEDIAL_SOURCES src/sinedial.cpp
-                     src/sinedial_mainwindow.cpp
-                     include/sinedial_mainwindow.h
+set(SINEDIAL_SOURCES
+  src/sinedial.cpp
+  src/sinedial_mainwindow.cpp
+  include/sinedial_mainwindow.hpp
 )
 
 QT5_WRAP_CPP(SINEDIAL_MOCrcs
-            ${SINEDIAL_SOURCES}
+  ${SINEDIAL_SOURCES}
 )
 
 QT5_WRAP_UI(SINEDIAL_UISrcs
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/sinedial.ui)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/sinedial.ui)
 
 add_executable(sinedial)
 target_sources(sinedial
   PRIVATE
-    ${SINEDIAL_SOURCES}
-    ${SINEDIAL_UISrcs}
-    ${SINEDIAL_MOCrcs}
+  ${SINEDIAL_SOURCES}
+  ${SINEDIAL_UISrcs}
+  ${SINEDIAL_MOCrcs}
 )
 target_include_directories(sinedial PRIVATE include)
 target_include_directories(sinedial PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -137,11 +139,11 @@ target_include_directories(sinedial SYSTEM
   qtjack::qtjack
 )
 target_link_libraries(sinedial PRIVATE
-    qtjack::qtjack
-    Qt5::Core
-    Qt5::Widgets
-    ${JACK_LIBRARIES}
-    sine_wave
+  qtjack::qtjack
+  Qt5::Core
+  Qt5::Widgets
+  ${JACK_LIBRARIES}
+  sine_wave
 )
 
 ####### BPM Tab #######
@@ -149,7 +151,7 @@ set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp
 )
 set(AVRG_QUEUE_HEADERS
-  include/avrg_queue.h
+  include/avrg_queue.hpp
 )
 
 set(AVRG_QUEUE_TEST_SOURCES
@@ -158,17 +160,17 @@ set(AVRG_QUEUE_TEST_SOURCES
 
 set(SINE_WAVE_SOURCES
   src/sine_wave.cpp
-  include/sine_wave.h
+  include/sine_wave.hpp
 )
 
 set(WAVE_WIDGET_SOURCES
   src/wave_widget.cpp
-  include/wave_widget.h
+  include/wave_widget.hpp
 )
 
 set(BPM_TAB_SOURCES
   src/bpm_tab.cpp
-  include/bpm_tab.h
+  include/bpm_tab.hpp
 )
 
 set(BPM_TAB_MAIN_SOURCES
@@ -176,7 +178,7 @@ set(BPM_TAB_MAIN_SOURCES
 )
 
 set(WAVE_WIDGET_TEST_SOURCES
-  include/test/main_window_test.h
+  include/test/main_window_test.hpp
   src/test/main_window_test.cpp
   src/test/wave_widget_test.cpp
 )
@@ -226,11 +228,11 @@ add_library(wave_widget
 target_include_directories(wave_widget PRIVATE include)
 target_include_directories(wave_widget PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(wave_widget SYSTEM
-  PUBLIC 
+  PUBLIC
   ${Qt5Core_INCLUDE_DIRS}
   ${Qt5Widgets_INCLUDE_DIRS}
 )
-target_link_libraries(wave_widget PRIVATE 
+target_link_libraries(wave_widget PRIVATE
   Qt5::Core
   Qt5::Widgets
   sine_wave
@@ -293,9 +295,10 @@ target_include_directories(bpm_tab_main SYSTEM
   ${Qt5Widgets_INCLUDE_DIRS}4
 )
 
-target_link_libraries(bpm_tab_main PRIVATE
-    Qt5::Core
-    Qt5::Widgets
-    qtjack::qtjack
-    bpm_tab
+target_link_libraries(bpm_tab_main
+  PRIVATE
+  Qt5::Core
+  Qt5::Widgets
+  qtjack::qtjack
+  bpm_tab
 )

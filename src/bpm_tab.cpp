@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <chrono>
 #include <QString>
-#include "bpm_tab.h"
+#include "bpm_tab.hpp"
 
 BpmTab::BpmTab(QWidget *parent)
     : QWidget(parent)
@@ -47,7 +47,7 @@ void BpmTab::setupJackClient() {
   // audio port
   _audio_in_port = _client.registerAudioInPort("in");
   _audio_ring_buffer = QtJack::AudioRingBuffer();
-  
+
   _client.setMainProcessor(this);
   _client.activate();
 }
@@ -60,12 +60,12 @@ void BpmTab::midi_message_send() {
         std::thread send_node_off = std::thread([this]() {
           std::this_thread::sleep_for(std::chrono::milliseconds(20));
           emit trigger_midi_msg_send(false);
-        });    
+        });
         send_node_off.detach();
     }
     int ms = 60000 / bpm;
     //ToDo: need syncing with conditional variable here + timeout
-    std::this_thread::sleep_for(std::chrono::milliseconds(ms));    
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
   }
 }
 
@@ -91,7 +91,7 @@ void BpmTab::process(int samples) {
 
     //note_on [0x91,0x69,0x3f]
     //note_off [0x81,0x09,0x3f]
-    
+
     unsigned char midiData[3];
     if (_note_on_off) {
       midiData[0] = 0x91;
@@ -127,7 +127,7 @@ void BpmTab::audio_process_fct() {
             } //read in finished
         }
         // Process read data
-    }    
+    }
 }
 void BpmTab::on_tab_button() {
     printf("button tabed\n");

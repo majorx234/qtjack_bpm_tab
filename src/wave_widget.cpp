@@ -1,8 +1,8 @@
 #include <QPainter>
 #include <QColor>
 #include <QResizeEvent>
-#include "wave_widget.h"
-#include "sine_wave.h"
+#include "wave_widget.hpp"
+#include "sine_wave.hpp"
 
 WaveWidget::WaveWidget(QWidget *parent) {
   setMinimumSize(400,100);
@@ -44,7 +44,7 @@ void WaveWidget::paintEvent(QPaintEvent *event) {
 }
 
 void WaveWidget::resizeEvent(QResizeEvent *ev) {
-  
+
 }
 void WaveWidget::setChunk(double limit_1high,double limit_1low,double limit_2high,double limit_2low) {
   wave_[0][wave_ofs_] = limit_1high;
@@ -86,5 +86,3 @@ void WaveWidget::testChunk() {
     repaint();
     }
 }
-
-

@@ -21,8 +21,8 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef WAVE_WIDGET_H_
-#define WAVE_WIDGET_H_
+#ifndef WAVE_WIDGET_HPP_
+#define WAVE_WIDGET_HPP_
 
 #include <QWidget>
 
@@ -50,4 +50,4 @@ protected:
 };
 
 
-#endif // WAVE_WIDGET_H_
+#endif // WAVE_WIDGET_HPP_

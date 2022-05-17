@@ -1,5 +1,5 @@
-#include "test/main_window_test.h"
-#include "wave_widget.h"
+#include "test/main_window_test.hpp"
+#include "wave_widget.hpp"
 
 MainWindowTest::MainWindowTest(QWidget *parent)
   : QMainWindow(parent)
@@ -10,7 +10,7 @@ MainWindowTest::MainWindowTest(QWidget *parent)
 }
 
 MainWindowTest::~MainWindowTest() {
-    killTimer(timerId); 
+    killTimer(timerId);
 }
 
 void MainWindowTest::timerEvent(QTimerEvent *event) {

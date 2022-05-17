@@ -1,4 +1,4 @@
-#include "avrg_queue.h"
+#include "avrg_queue.hpp"
 #include <cstdio>
 
 int main(int argc, char *argv[]) {
@@ -8,4 +8,3 @@ int main(int argc, char *argv[]) {
     printf("avrg: %d %f\n",i, test_queue.get_avrg());
   }
 }
-

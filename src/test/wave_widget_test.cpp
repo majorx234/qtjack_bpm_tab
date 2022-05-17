@@ -2,7 +2,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include "test/main_window_test.h"
+#include "test/main_window_test.hpp"
 
 void catchUnixSignal(int quitSignal) {
   auto handler = [](int sig) -> void {
@@ -20,7 +20,7 @@ void catchUnixSignal(int quitSignal) {
   sa.sa_flags = 0;
 
   sigaction(quitSignal, &sa, nullptr);
-  
+
 }
 
 int main(int argc, char *argv[]) {
@@ -28,9 +28,8 @@ int main(int argc, char *argv[]) {
   catchUnixSignal(SIGINT);
 
   MainWindowTest main_window;
-  
+
   main_window.show();
-  
+
   return app.exec();
 }
- 
