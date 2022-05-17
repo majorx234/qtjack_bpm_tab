@@ -21,8 +21,8 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef MIDIDIAL_MAINWINDOW_HPP
-#define MIDIDIAL_MAINWINDOW_HPP
+#ifndef MIDIDIAL_MAINWINDOW_HPP_
+#define MIDIDIAL_MAINWINDOW_HPP_
 #include <atomic>
 
 // QtJack includes
@@ -70,4 +70,4 @@ private:
     std::atomic<int> _timestamp;
 };
 
-#endif // MIDIDIAL_MAINWINDOW_HPP
+#endif // MIDIDIAL_MAINWINDOW_HPP_

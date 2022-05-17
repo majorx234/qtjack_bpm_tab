@@ -21,8 +21,8 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef MP3PLAYER_MAINWINDOW_HPP
-#define MP3PLAYER_MAINWINDOW_HPP
+#ifndef MP3PLAYER_MAINWINDOW_HPP_
+#define MP3PLAYER_MAINWINDOW_HPP_
 
 // QtJack includes
 #include <Client>
@@ -71,4 +71,4 @@ private:
     QtJack::AudioRingBuffer _ringBufferRight;
 };
 
-#endif // MP3PLAYER_MAINWINDOW_HPP
+#endif // MP3PLAYER_MAINWINDOW_HPP_
