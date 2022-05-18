@@ -55,12 +55,14 @@ public:
 protected slots:
     void on_twist();
 
+ protected:
+  void timerEvent(QTimerEvent*) override;
 private:
     Ui::Sinedial *sinedial_ui;
 
     QtJack::Client _client;
     QtJack::AudioPort _audio_out[2];
-    QtJack::AudioRingBuffer *_audio_ring_buffer[2];
+    QtJack::AudioRingBuffer _audio_ring_buffer[2];
     QAbstractSlider *slider_base_freq;
     QAbstractSlider *slider_mod_freq;
     std::atomic<unsigned int> _value_base_freq;
@@ -70,7 +72,8 @@ private:
 
     std::thread sine_wave_generate_thread;
     unsigned int generated_samples_per_tick;
-    unsigned int samples_offset;
+    unsigned int samples_offset_left;
+    unsigned int samples_offset_right;
     QtJack::AudioSample* left;
     QtJack::AudioSample* right;
 };
