@@ -25,7 +25,10 @@
 #include <QColor>
 #include <QResizeEvent>
 #include "wave_widget.hpp"
-#include "sine_wave.hpp"
+
+// ToDo: just for test reasons will be replaced
+#include <math.h>
+#define _USE_MATH_DEFINES
 
 WaveWidget::WaveWidget(QWidget *parent) {
   setMinimumSize(400,100);
@@ -78,6 +81,21 @@ void WaveWidget::setChunk(double limit_1high,double limit_1low,double limit_2hig
   if (wave_ofs_ >= width())
     wave_ofs_ = 0;
   repaint();
+}
+
+// just for test reasons, will be replaced in future
+void sine_wave( float values[],
+                int freq,
+                int freq_amp,
+                int num_samples,
+                int  offset,
+                int sample_rate) {
+  //int num_samples  = static_cast<int>(duration * sample_rate);
+  for (int i =  offset; i < num_samples + offset; i++) {
+    values[i-offset] =
+        sin((2 * M_PI * freq_amp * i)/ sample_rate)
+        * sin((2 * M_PI * freq * i) / sample_rate);
+  }
 }
 
 void WaveWidget::testChunk() {
