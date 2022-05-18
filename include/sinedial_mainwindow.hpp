@@ -34,6 +34,7 @@
 
 // Qt includes
 #include <QMainWindow>
+#include <QSlider>
 #include "ui_sinedial.h"
 
 namespace Ui {
