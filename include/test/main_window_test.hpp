@@ -30,14 +30,14 @@
 class MainWindowTest : public QMainWindow
 {
   Q_OBJECT
-public:
+ public:
   explicit MainWindowTest(QWidget *parent = 0);
   ~MainWindowTest();
 
-private:
-    int timerId;
-    WaveWidget wave_widget;
-protected:
+ private:
+  int timerId;
+  WaveWidget wave_widget;
+ protected:
   void timerEvent(QTimerEvent *event);
 };
 

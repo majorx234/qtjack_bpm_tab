@@ -27,7 +27,7 @@
 #include <queue>
 
 class AvrgQueue {
-public:
+ public:
   AvrgQueue(unsigned int max_elements);
   ~AvrgQueue();
 
@@ -37,7 +37,7 @@ public:
   void clear();
   void setMax(unsigned int new_max);
   void holdLast();
-private:
+ private:
   std::queue<double> values;
   unsigned int max_elements_;
 };

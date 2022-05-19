@@ -28,29 +28,34 @@
 #include "bpm_tab.hpp"
 
 BpmTab::BpmTab(QWidget *parent)
-    : QWidget(parent)
-    , Processor(_client)
-    , bpm_tab_ui(new Ui::BpmTab)
-    , first_tab(true)
-    , started(false)
-    , max_wait(5000)
-    , bpm(120)
-    , count(0)
-    , avrg_queue(8)
-    , alive(true)
-    , _audio_buffer_size(48000*30) // 30seconds audiobuffer
-    , _new_samples_in_audio_buffer(0)
+  : QWidget(parent)
+  , Processor(_client)
+  , bpm_tab_ui(new Ui::BpmTab)
+  , first_tab(true)
+  , started(false)
+  , max_wait(5000)
+  , bpm(120)
+  , count(0)
+  , avrg_queue(8)
+  , alive(true)
+  , _audio_buffer_size(48000*30) // 30seconds audiobuffer
+  , _new_samples_in_audio_buffer(0)
 {
-  _audio_buffer = (QtJack::AudioSample*)malloc(_audio_buffer_size*sizeof(QtJack::AudioSample));
+  _audio_buffer =
+      (QtJack::AudioSample*)malloc(_audio_buffer_size
+                                   * sizeof(QtJack::AudioSample));
     bpm_tab_ui->setupUi(this);
     wave_widget = new WaveWidget(parent);
     QHBoxLayout *waveHbox = new QHBoxLayout(parent);
     waveHbox->addWidget(wave_widget);
     bpm_tab_ui->waveBox->setLayout(waveHbox);
     setupJackClient();
-    connect(this, SIGNAL(setBpm(QString)), this->bpm_tab_ui->bpmLabel, SLOT(setText(QString)));
-    connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked, this, &BpmTab::on_tab_button);
-    connect(this, &BpmTab::trigger_midi_msg_send, this, &BpmTab::on_midi_message_send, Qt::QueuedConnection);
+    connect(this, SIGNAL(setBpm(QString)),
+            this->bpm_tab_ui->bpmLabel, SLOT(setText(QString)));
+    connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked,
+            this, &BpmTab::on_tab_button);
+    connect(this, &BpmTab::trigger_midi_msg_send,
+            this, &BpmTab::on_midi_message_send, Qt::QueuedConnection);
     //    connect(this, &BpmTab::jack_tick,wave_widget,&WaveWidget::getChunk);
     cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
 }
@@ -79,12 +84,12 @@ void BpmTab::midi_message_send() {
   //thread function
   while (alive) {
     if (started) {
-        emit trigger_midi_msg_send(true);
-        std::thread send_node_off = std::thread([this]() {
-          std::this_thread::sleep_for(std::chrono::milliseconds(20));
-          emit trigger_midi_msg_send(false);
-        });
-        send_node_off.detach();
+      emit trigger_midi_msg_send(true);
+      std::thread send_node_off = std::thread([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        emit trigger_midi_msg_send(false);
+      });
+      send_node_off.detach();
     }
     int ms = 60000 / bpm;
     //ToDo: need syncing with conditional variable here + timeout
@@ -112,20 +117,20 @@ void BpmTab::process(int samples) {
 
   if ((t > 0) && (t < samples)) {
 
-    //note_on [0x91,0x69,0x3f]
-    //note_off [0x81,0x09,0x3f]
+  //note_on [0x91,0x69,0x3f]
+  //note_off [0x81,0x09,0x3f]
 
-    unsigned char midiData[3];
-    if (_note_on_off) {
-      midiData[0] = 0x91;
-      midiData[1] = 0x69;
-      midiData[2] = 0x3f; // & printvalue;
-    } else {
-      midiData[0] = 0x81;
-      midiData[1] = 0x69;
-      midiData[2] = 0x3f; // & printvalue;
-    }
-    port_buffer.writeEvent(t, midiData, 3);
+  unsigned char midiData[3];
+  if (_note_on_off) {
+    midiData[0] = 0x91;
+    midiData[1] = 0x69;
+    midiData[2] = 0x3f; // & printvalue;
+  } else {
+    midiData[0] = 0x81;
+    midiData[1] = 0x69;
+    midiData[2] = 0x3f; // & printvalue;
+  }
+  port_buffer.writeEvent(t, midiData, 3);
     emit jack_tick();
   }
   //audio part
@@ -133,51 +138,59 @@ void BpmTab::process(int samples) {
 }
 
 void BpmTab::audio_process_fct() {
-    int max_elemets = _audio_buffer_size;
-    while(alive)
+  int max_elemets = _audio_buffer_size;
+  while(alive)
+  {
     {
-        {
-            std::unique_lock<std::mutex> lock(audio_mutex);
-            // ToDo: timeout shoul be a class member
-            int timeInMillisec = 1000;
-            while(audio_chunk_cv.wait_for(lock,std::chrono::milliseconds(timeInMillisec))==std::cv_status::timeout){
-                if(!alive) return;
-                //do stuff
-                int num_elements = _audio_ring_buffer.numberOfElementsAvailableForRead();
-                //need to copy, not more than buffer size
-                max_elemets = num_elements < _audio_buffer_size ? num_elements : _audio_buffer_size;
-                _audio_ring_buffer.read(_audio_buffer, max_elemets);
-            } //read in finished
-        }
-        // Process read data
+      std::unique_lock<std::mutex> lock(audio_mutex);
+      // ToDo: timeout shoul be a class member
+      int timeInMillisec = 1000;
+      while(audio_chunk_cv.wait_for(
+                 lock,std::chrono::milliseconds(timeInMillisec))
+             == std::cv_status::timeout) {
+         if(!alive) return;
+         //do stuff
+        int num_elements =
+            _audio_ring_buffer.numberOfElementsAvailableForRead();
+        //need to copy, not more than buffer size
+        max_elemets =
+            num_elements < _audio_buffer_size ?
+            num_elements : _audio_buffer_size;
+        _audio_ring_buffer.read(_audio_buffer, max_elemets);
+      } //read in finished
     }
+    // Process read data
+  }
 }
 void BpmTab::on_tab_button() {
-    printf("button tabed\n");
-    std::chrono::steady_clock::time_point new_timestamp = std::chrono::steady_clock::now();
-    if(first_tab) {
-        count = 1;
-        first_tab = false;
-        printf("first\n");
-    } else {
-        unsigned int milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(new_timestamp - last_timestamp).count();
-        printf("ms : %d\n",milliseconds );
-        if (milliseconds > max_wait) {
-            last_timestamp = new_timestamp;
-            count = 1;
-            avrg_queue.holdLast();
-            first_tab = true;
-            return;
-        }
-        avrg_queue.add_value(milliseconds);
-        double avrg_milliseconds = avrg_queue.get_avrg();
-        double bpm_avg = 60000 / avrg_milliseconds;
-        bpm = int(bpm_avg * 100 + 0.5)/ 100.0;
-        count++;
-        emit setBpm(QString::number(bpm));
-        if(!started)
-          started = true;
-    }
+  printf("button tabed\n");
+  std::chrono::steady_clock::time_point new_timestamp =
+      std::chrono::steady_clock::now();
+  if(first_tab) {
+    count = 1;
+    first_tab = false;
+    printf("first\n");
+  } else {
+    unsigned int milliseconds =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            new_timestamp - last_timestamp).count();
+  printf("ms : %d\n",milliseconds );
+  if (milliseconds > max_wait) {
     last_timestamp = new_timestamp;
+    count = 1;
+    avrg_queue.holdLast();
+    first_tab = true;
     return;
+  }
+  avrg_queue.add_value(milliseconds);
+  double avrg_milliseconds = avrg_queue.get_avrg();
+  double bpm_avg = 60000 / avrg_milliseconds;
+  bpm = int(bpm_avg * 100 + 0.5)/ 100.0;
+  count++;
+  emit setBpm(QString::number(bpm));
+  if(!started)
+    started = true;
+  }
+  last_timestamp = new_timestamp;
+  return;
 }

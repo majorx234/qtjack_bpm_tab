@@ -24,7 +24,7 @@
 #include "avrg_queue.hpp"
 
 AvrgQueue::AvrgQueue(unsigned int max_elements)
-    : max_elements_(max_elements)
+  : max_elements_(max_elements)
 {
 }
 

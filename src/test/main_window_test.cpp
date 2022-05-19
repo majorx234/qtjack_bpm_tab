@@ -28,14 +28,14 @@ MainWindowTest::MainWindowTest(QWidget *parent)
   : QMainWindow(parent)
   , wave_widget(this)
 {
-    setCentralWidget(&wave_widget);
-    timerId = startTimer(1000);
+  setCentralWidget(&wave_widget);
+  timerId = startTimer(1000);
 }
 
 MainWindowTest::~MainWindowTest() {
-    killTimer(timerId);
+  killTimer(timerId);
 }
 
 void MainWindowTest::timerEvent(QTimerEvent *event) {
-    wave_widget.testChunk();
+  wave_widget.testChunk();
 }

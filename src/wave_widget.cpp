@@ -63,8 +63,14 @@ void WaveWidget::paintEvent(QPaintEvent *event) {
   p.drawLine(0, (int)(1.5 * (double)l), w - 1, (int)(1.5 * (double)l));
   for (int i = 0; i < w; i++) {
 
-    p.drawLine(i, (int)(0.5 * (double)l - yScale * wave_[0][(wave_ofs_ + i) % w]), i, (int)(0.5 * (double)l - yScale * wave_[1][(wave_ofs_ + i) % w]));
-    p.drawLine(i, (int)(1.5 * (double)l - yScale * wave_[2][(wave_ofs_ + i) % w]), i, (int)(1.5 * (double)l - yScale * wave_[3][(wave_ofs_ + i) % w]));
+    p.drawLine(i,
+               (int)(0.5 * (double)l - yScale * wave_[0][(wave_ofs_ + i) % w]),
+               i,
+               (int)(0.5 * (double)l - yScale * wave_[1][(wave_ofs_ + i) % w]));
+    p.drawLine(i,
+               (int)(1.5 * (double)l - yScale * wave_[2][(wave_ofs_ + i) % w]),
+               i,
+               (int)(1.5 * (double)l - yScale * wave_[3][(wave_ofs_ + i) % w]));
   }
   p.end();
 }
@@ -72,7 +78,10 @@ void WaveWidget::paintEvent(QPaintEvent *event) {
 void WaveWidget::resizeEvent(QResizeEvent *ev) {
 
 }
-void WaveWidget::setChunk(double limit_1high,double limit_1low,double limit_2high,double limit_2low) {
+void WaveWidget::setChunk(double limit_1high,
+                          double limit_1low,
+                          double limit_2high,
+                          double limit_2low) {
   wave_[0][wave_ofs_] = limit_1high;
   wave_[1][wave_ofs_] = limit_1low;
   wave_[2][wave_ofs_] = limit_2high;
