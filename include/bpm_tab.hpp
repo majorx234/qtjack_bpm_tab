@@ -36,6 +36,7 @@
 #include <Client>
 #include <Processor>
 #include <RingBuffer>
+#include <MidiMsg>
 
 #include "avrg_queue.hpp"
 #include "wave_widget.hpp"
@@ -66,7 +67,8 @@ class BpmTab : public QWidget, public QtJack::Processor {
   WaveWidget* wave_widget;
   QtJack::Client _client;
   QtJack::MidiPort _midi_out;
-  QtJack::MidiBuffer *_midi_out_buffer; //not used yet
+  QtJack::MidiMsgRingBuffer _midi_out_buffer;
+  jack_nframes_t last_frame_time;
   QtJack::AudioPort _audio_in_port;
   QtJack::AudioRingBuffer _audio_ring_buffer;
   size_t _audio_buffer_size;

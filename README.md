@@ -2,10 +2,10 @@
 - Gui for tabing BPM and sending periodical MIDI messages
 - WIP!
  - tab button is working
-  - midimessages are sent, but timing is not accurate
- - planned is audio input taht is visualized
- - planned audioinput with beat detection
- - planned dial to change phase of sended midi messages
+  - midi messages are sent, timing is accurate
+ - planned: audio input is visualized
+ - planned: audio input with beat detection
+ - planned: dial to change phase of sended midi messages
 
 ## Info
 Dependencies:
@@ -43,5 +43,6 @@ make
 ```
 
 ## History
+- 2022-05-20 Now timing behavior is accurate
 - 2022-05-19 switch to own repo
 - 2022-04-14 first version sending periodic Midi messsages
