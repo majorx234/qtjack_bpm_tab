@@ -30,7 +30,8 @@ majorx234@googlemail.com
 ```
 
 ## Usage
-- build project: ```
+- build project:
+```
 git clone https://github.com/majorx234/qtjack_bpm_tab.git
 cd qtjack_bpm_tab
 mkdir build
@@ -38,7 +39,8 @@ cd build
 cmake ..
 make
 ```
-- run ```
+- run:
+```
 ./bpm_tab_main
 ```
 
@@ -46,3 +48,9 @@ make
 - 2022-05-20 Now timing behavior is accurate
 - 2022-05-19 switch to own repo
 - 2022-04-14 first version sending periodic Midi messsages
+
+## ToDo
+- read in audio data (visualize in wave widget)
+- beat detection on audio data
+- beat triggering of tab button
+- Add possibility to send midi beat clock
