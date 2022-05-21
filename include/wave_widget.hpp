@@ -35,10 +35,10 @@ class WaveWidget : public QWidget
   ~WaveWidget();
 
  public slots:
-  void setChunk(double limit_1high,
-                double limit_1low,
-                double limit_2high,
-                double limit_2low);
+  void setChunk(float limit_1high,
+                float limit_1low,
+                float limit_2high,
+                float limit_2low);
   void testChunk();
 
  private:
@@ -48,9 +48,8 @@ class WaveWidget : public QWidget
   int frame_rate;
 
  protected:
-  virtual void paintEvent(QPaintEvent*);
-  virtual void resizeEvent(QResizeEvent *ev);
+  virtual void paintEvent(QPaintEvent*) override;
+  virtual void resizeEvent(QResizeEvent *ev) override;
 };
-
 
 #endif // WAVE_WIDGET_HPP_

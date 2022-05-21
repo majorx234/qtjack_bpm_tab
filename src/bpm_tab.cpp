@@ -42,10 +42,13 @@ BpmTab::BpmTab(QWidget *parent)
   , _audio_buffer_size(48000*30) // 30seconds audiobuffer
   , _new_samples_in_audio_buffer(0)
 {
-  _audio_buffer =
+  _audio_buffer[0] =
       (QtJack::AudioSample*)malloc(_audio_buffer_size
                                    * sizeof(QtJack::AudioSample));
-    bpm_tab_ui->setupUi(this);
+  _audio_buffer[1] =
+      (QtJack::AudioSample*)malloc(_audio_buffer_size
+                                   * sizeof(QtJack::AudioSample));
+  bpm_tab_ui->setupUi(this);
     wave_widget = new WaveWidget(parent);
     QHBoxLayout *waveHbox = new QHBoxLayout(parent);
     waveHbox->addWidget(wave_widget);
@@ -57,16 +60,18 @@ BpmTab::BpmTab(QWidget *parent)
             this, &BpmTab::on_tab_button);
     connect(this, &BpmTab::trigger_midi_msg_send,
             this, &BpmTab::on_midi_message_send, Qt::QueuedConnection);
-    //    connect(this, &BpmTab::jack_tick,wave_widget,&WaveWidget::getChunk);
+    connect(this, &BpmTab::limits_ready, wave_widget, &WaveWidget::setChunk);
 
     //thread to generate periodic midimsgs
     cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
+    startTimer(50);
 }
 
 BpmTab::~BpmTab() {
   alive = false;
   cyclic_midi_msgs_sender.join();
-  delete _audio_buffer;
+  delete _audio_buffer[0];
+  delete _audio_buffer[1];
 }
 
 void BpmTab::setupJackClient() {
@@ -78,9 +83,10 @@ void BpmTab::setupJackClient() {
   _midi_out_buffer = QtJack::MidiMsgRingBuffer(5*48000);
 
   // audio port
-  _audio_in_port = _client.registerAudioInPort("in");
-  _audio_ring_buffer = QtJack::AudioRingBuffer();
-
+  _audio_in_port[0] = _client.registerAudioInPort("in 1");
+  _audio_in_port[1] = _client.registerAudioInPort("in 2");
+  _audio_ring_buffer[0] = QtJack::AudioRingBuffer();
+  _audio_ring_buffer[1] = QtJack::AudioRingBuffer();
   _client.setMainProcessor(this);
   _client.activate();
 }
@@ -123,6 +129,9 @@ void BpmTab::on_midi_message_send(bool note_on_off) {
   }
 }
 
+void BpmTab::timerEvent(QTimerEvent *event) {
+  audio_process_fct();
+}
 void BpmTab::process(int samples) {
   // midi part
   QtJack::MidiBuffer port_buffer = _midi_out.buffer(samples);
@@ -169,32 +178,54 @@ void BpmTab::process(int samples) {
     elements = _midi_out_buffer.numberOfElementsAvailableForRead();
   }
   // audio part
-  //_audio_in_port.buffer(samples).push(_audio_ring_buffer);
+  _audio_in_port[0].buffer(samples).push(_audio_ring_buffer[0]);
+  _audio_in_port[1].buffer(samples).push(_audio_ring_buffer[1]);
 }
 
 void BpmTab::audio_process_fct() {
-  int max_elemets = _audio_buffer_size;
-  while(alive)
-  {
-    {
-      std::unique_lock<std::mutex> lock(audio_mutex);
-      // ToDo: timeout shoul be a class member
-      int timeInMillisec = 1000;
-      while(audio_chunk_cv.wait_for(
-                 lock,std::chrono::milliseconds(timeInMillisec))
-             == std::cv_status::timeout) {
-         if(!alive) return;
-         //do stuff
-        int num_elements =
-            _audio_ring_buffer.numberOfElementsAvailableForRead();
-        //need to copy, not more than buffer size
-        max_elemets =
-            num_elements < _audio_buffer_size ?
-            num_elements : _audio_buffer_size;
-        _audio_ring_buffer.read(_audio_buffer, max_elemets);
-      } //read in finished
+  int max_elemets[2];
+  max_elemets[0] = _audio_buffer_size;
+  max_elemets[1] = _audio_buffer_size;
+
+  int timeInMillisec = 1000;
+  size_t ring_buffer_right_size =
+      _audio_ring_buffer[0].numberOfElementsAvailableForRead();
+  size_t ring_buffer_left_size =
+      _audio_ring_buffer[1].numberOfElementsAvailableForRead();
+  //need to copy, not more than buffer size
+  max_elemets[0] = ring_buffer_right_size < _audio_buffer_size ?
+                   ring_buffer_right_size : _audio_buffer_size;
+  // norm to 1014
+  max_elemets[0] = 1024*(max_elemets[0] / 1024);
+  int s0 = _audio_ring_buffer[0].read(_audio_buffer[0], max_elemets[0]);
+
+  //need to copy, not more than buffer size
+  max_elemets[1] = ring_buffer_left_size < _audio_buffer_size ?
+                   ring_buffer_left_size : _audio_buffer_size;
+  // norm to 1014
+  max_elemets[1] = 1024*(max_elemets[1] / 1024);
+  int s1 = _audio_ring_buffer[1].read(_audio_buffer[1], max_elemets[1]);
+
+  // Process read data here _audio_buffer[*]
+  float limits[4] = {0.0, 0.0, 0.0, 0.0};
+  for (int j = 0; j < max_elemets[0]; j++) {
+    if(_audio_buffer[0][j] < limits[2*0]) {
+      limits[2*0] = _audio_buffer[0][j];
+    } else if (_audio_buffer[0][j] > limits[2 * 0 + 1]) {
+      limits[2*0+1] = _audio_buffer[0][j];
     }
-    // Process read data
+    if(_audio_buffer[1][j] < limits[2*1]) {
+      limits[2*1] = _audio_buffer[1][j];
+    } else if (_audio_buffer[1][j] > limits[2 * 1 + 1]) {
+      limits[2*1+1] = _audio_buffer[1][j];
+    }
+    if(j%128 == 127) {
+      emit limits_ready(limits[0],limits[1],limits[2],limits[3]);
+      limits[0] = 0;
+      limits[1] = 0;
+      limits[2] = 0;
+      limits[3] = 0;
+    }
   }
 }
 

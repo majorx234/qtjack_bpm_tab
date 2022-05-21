@@ -58,9 +58,15 @@ class BpmTab : public QWidget, public QtJack::Processor {
   void setBpm(QString bpm_string);
   void trigger_midi_msg_send(bool);
   void jack_tick();
+  void limits_ready(float,float,float,float);
+
  protected slots:
   void on_tab_button();
   void on_midi_message_send(bool);
+
+ protected:
+  void timerEvent(QTimerEvent*) override;
+
  private:
   void midi_message_send();
   Ui::BpmTab *bpm_tab_ui;
@@ -69,10 +75,10 @@ class BpmTab : public QWidget, public QtJack::Processor {
   QtJack::MidiPort _midi_out;
   QtJack::MidiMsgRingBuffer _midi_out_buffer;
   jack_nframes_t last_frame_time;
-  QtJack::AudioPort _audio_in_port;
-  QtJack::AudioRingBuffer _audio_ring_buffer;
+  QtJack::AudioPort _audio_in_port[2];
+  QtJack::AudioRingBuffer _audio_ring_buffer[2];
   size_t _audio_buffer_size;
-  QtJack::AudioSample* _audio_buffer;
+  QtJack::AudioSample* _audio_buffer[2];
   size_t _new_samples_in_audio_buffer;
 
   // midimessages

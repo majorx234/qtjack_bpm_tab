@@ -78,10 +78,10 @@ void WaveWidget::paintEvent(QPaintEvent *event) {
 void WaveWidget::resizeEvent(QResizeEvent *ev) {
 
 }
-void WaveWidget::setChunk(double limit_1high,
-                          double limit_1low,
-                          double limit_2high,
-                          double limit_2low) {
+void WaveWidget::setChunk(float limit_1high,
+                          float limit_1low,
+                          float limit_2high,
+                          float limit_2low) {
   wave_[0][wave_ofs_] = limit_1high;
   wave_[1][wave_ofs_] = limit_1low;
   wave_[2][wave_ofs_] = limit_2high;
