@@ -62,6 +62,24 @@ target_include_directories(phase_vocoder PRIVATE
 target_link_libraries(phase_vocoder 
   fft)
 
+set(DETECTION_FUNCTION_SOURCES
+  src/bpmdetection/detection_function.cpp
+)
+set(DETECTION_FUNCTION_HEADERS
+  include/bpmdetection/detection_function.hpp
+)
+add_library(detection_function)
+target_sources(detection_function
+  PRIVATE  ${DETECTION_FUNCTION_HEADERS}
+  PUBLIC ${DETECTION_FUNCTION_HEADERS}
+)
+target_include_directories(detection_function PRIVATE 
+  include
+  include/maths
+)
+target_link_libraries(detection_function
+  phase_vocoder)
+
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp
