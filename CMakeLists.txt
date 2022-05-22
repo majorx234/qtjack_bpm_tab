@@ -80,6 +80,24 @@ target_include_directories(detection_function PRIVATE
 target_link_libraries(detection_function
   phase_vocoder)
 
+set(TEMPO_TRACKV2_SOURCES
+  src/bpmdetection/TempoTrackV2.cpp
+)
+set(TEMPO_TRACKV2_HEADERS
+  include/bpmdetection/TempoTrackV2.h
+)
+add_library(tempo_track_v2)
+target_sources(tempo_track_v2
+  PRIVATE  ${TEMPO_TRACKV2_HEADERS}
+  PUBLIC ${TEMPO_TRACKV2_HEADERS}
+)
+target_include_directories(tempo_track_v2 PRIVATE 
+  include
+  include/maths
+)
+target_link_libraries(tempo_track_v2
+  phase_vocoder)
+
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp
