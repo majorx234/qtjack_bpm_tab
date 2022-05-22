@@ -98,6 +98,29 @@ target_include_directories(tempo_track_v2 PRIVATE
 target_link_libraries(tempo_track_v2
   phase_vocoder)
 
+set(BUFFERING_UTILS_SOURCES
+  src/bpmdetection/buffering_utils.cpp
+  src/util/sample.cpp
+  src/util/fpclassify.cpp
+)
+set(BUFFERING_UTILS_HEADERS
+  include/bpmdetection/buffering_utils.hpp
+  include/util/assert.h
+  include/util/fpclassify.h
+  include/util/math.h
+  include/util/sample.h
+)
+add_library(buffering_utils)
+target_sources(buffering_utils
+  PRIVATE  ${BUFFERING_UTILS_HEADERS}
+  PUBLIC ${BUFFERING_UTILS_HEADERS}
+)
+target_include_directories(buffering_utils PRIVATE 
+  include
+  include/util
+  include/bpmdetection
+)
+set_target_properties(buffering_utils PROPERTIES LINKER_LANGUAGE CXX)
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp

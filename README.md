@@ -44,6 +44,7 @@ make
 ./bpm_tab_main
 ```
 ## Reference 
+- uses parts of analyzerplugin concept of Mixxx: (https://github.com/mixxxdj/mixxx.git)
 - uses parts of qm-vamp-plugins: (queenmarybeatdetection & TempoTrackV2) (https://github.com/c4dm/qm-vamp-plugins)
 - uses Kissfft: (https://github.com/mborgerding/kissfft)
 - uses Idea for visualization of wave by Matthias Nagorni (https://www.heise.de/hintergrund/Parallelprogrammierung-mit-C-und-Qt-Teil-3-Plattformunabhaengige-Audioprogrammierung-1576739.html)
