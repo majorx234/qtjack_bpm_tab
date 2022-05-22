@@ -43,14 +43,18 @@ make
 ```
 ./bpm_tab_main
 ```
+## Reference 
+- uses Kissfft: https://github.com/mborgerding/kissfft
+- uses Idea for visualization of wave by Matthias Nagorni (https://www.heise.de/hintergrund/Parallelprogrammierung-mit-C-und-Qt-Teil-3-Plattformunabhaengige-Audioprogrammierung-1576739.html)
+  
 
 ## History
+- 2021-05-21 Add Visualization fo Jack Input
 - 2022-05-20 Now timing behavior is accurate
 - 2022-05-19 switch to own repo
 - 2022-04-14 first version sending periodic Midi messsages
 
 ## ToDo
-- read in audio data (visualize in wave widget)
 - beat detection on audio data
 - beat triggering of tab button
 - Add possibility to send midi beat clock

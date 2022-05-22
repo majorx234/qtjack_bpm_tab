@@ -15,6 +15,32 @@ find_package(Qt5Multimedia REQUIRED)
 find_package( qtjack REQUIRED)
 find_package(Threads REQUIRED)
 
+####### FFT #######
+set(FFT_SOURCES
+  src/maths/kiss_fft.c
+  src/maths/kiss_fftr.c
+)
+set(FFT_HEADERS
+  include/maths/_kiss_fft_guts.h
+  include/maths/kiss_fft.h
+  include/maths/kiss_fftr.h
+)
+
+add_library(fft)
+target_sources(fft
+  PRIVATE  ${FFT_SOURCES}
+  PUBLIC ${FFT_HEADERS}
+)
+target_include_directories(fft PRIVATE 
+  include
+  include/maths
+)
+set_target_properties(fft PROPERTIES LINKER_LANGUAGE CXX)
+#target_link_libraries(fft
+#)
+
+####### Beat Detection #######
+
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp
