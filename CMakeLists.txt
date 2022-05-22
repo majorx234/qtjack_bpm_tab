@@ -36,10 +36,31 @@ target_include_directories(fft PRIVATE
   include/maths
 )
 set_target_properties(fft PROPERTIES LINKER_LANGUAGE CXX)
-#target_link_libraries(fft
-#)
 
 ####### Beat Detection #######
+set(PHASE_VOCODER_SOURCES
+  src/maths/FFT.cpp
+  src/maths/MathUtilities.cpp
+  src/bpmdetection/PhaseVocoder.cpp
+  )
+set(PHASE_VOCODER_HEADERS
+  include/bpmdetection/PhaseVocoder.h
+  include/bpmdetection/Window.h
+  include/maths/FFT.h
+  include/maths/MathUtilities.h)
+
+add_library(phase_vocoder)
+target_sources(phase_vocoder
+  PRIVATE  ${PHASE_VOCODER_SOURCES}
+  PUBLIC ${PHASE_VOCODER_HEADERS}
+)
+target_include_directories(phase_vocoder PRIVATE 
+  include
+  include/beatdetection
+  include/maths
+)
+target_link_libraries(phase_vocoder 
+  fft)
 
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES

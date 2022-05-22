@@ -44,7 +44,8 @@ make
 ./bpm_tab_main
 ```
 ## Reference 
-- uses Kissfft: https://github.com/mborgerding/kissfft
+- uses parts of vamp- plugis :queenmarybeatdetection: (https://github.com/c4dm/qm-vamp-plugins)
+- uses Kissfft: (https://github.com/mborgerding/kissfft)
 - uses Idea for visualization of wave by Matthias Nagorni (https://www.heise.de/hintergrund/Parallelprogrammierung-mit-C-und-Qt-Teil-3-Plattformunabhaengige-Audioprogrammierung-1576739.html)
   
 
