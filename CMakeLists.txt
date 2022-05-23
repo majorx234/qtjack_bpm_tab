@@ -121,6 +121,31 @@ target_include_directories(buffering_utils PRIVATE
   include/bpmdetection
 )
 set_target_properties(buffering_utils PROPERTIES LINKER_LANGUAGE CXX)
+
+set(ANALYZER_QUEEN_MARY_BEATS_SOURCES
+  src/bpmdetection/analyzerqueenmarybeats.cpp
+)
+set(ANALYZER_QUEEN_MARY_BEATS_HEADERS
+  include/bpmdetection/constants.h
+  include/bpmdetection/analyzerplugin.hpp
+  include/bpmdetection/analyzerqueenmarybeats.hpp
+)
+
+add_library(analyzerqueenmarybeats)
+target_sources(analyzerqueenmarybeats
+  PRIVATE  ${ANALYZER_QUEEN_MARY_BEATS_HEADERS}
+  PUBLIC ${ANALYZER_QUEEN_MARY_BEATS_HEADERS}
+)
+target_include_directories(analyzerqueenmarybeats PRIVATE 
+  include
+  include/util
+  include/bpmdetection
+)
+target_link_libraries(analyzerqueenmarybeats
+  phase_vocoder
+  tempo_track_v2
+  buffering_utils
+)
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp
