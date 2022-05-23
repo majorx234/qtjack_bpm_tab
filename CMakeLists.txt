@@ -20,6 +20,7 @@ set(FFT_SOURCES
   src/maths/kiss_fft.c
   src/maths/kiss_fftr.c
 )
+set_source_files_properties(${FFT_SOURCES} PROPERTIES LANGUAGE CXX )
 set(FFT_HEADERS
   include/maths/_kiss_fft_guts.h
   include/maths/kiss_fft.h
@@ -28,7 +29,7 @@ set(FFT_HEADERS
 
 add_library(fft)
 target_sources(fft
-  PRIVATE  ${FFT_SOURCES}
+  PRIVATE ${FFT_SOURCES}
   PUBLIC ${FFT_HEADERS}
 )
 target_include_directories(fft PRIVATE 
@@ -112,7 +113,7 @@ set(BUFFERING_UTILS_HEADERS
 )
 add_library(buffering_utils)
 target_sources(buffering_utils
-  PRIVATE  ${BUFFERING_UTILS_HEADERS}
+  PRIVATE  ${BUFFERING_UTILS_SOURCES}
   PUBLIC ${BUFFERING_UTILS_HEADERS}
 )
 target_include_directories(buffering_utils PRIVATE 

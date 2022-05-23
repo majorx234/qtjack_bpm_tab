@@ -1,11 +1,9 @@
-#include "bpmdetection/buffering_utils.h"
+#include "bpmdetection/buffering_utils.hpp"
 
 #include "util/math.h"
 #include "util/sample.h"
 
 #include <string.h>
-
-namespace mixxx {
 
 bool DownmixAndOverlapHelper::initialize(size_t windowSize,
         size_t stepSize,
@@ -21,7 +19,7 @@ bool DownmixAndOverlapHelper::initialize(size_t windowSize,
             m_stepSize <= m_windowSize && callback;
 }
 
-bool DownmixAndOverlapHelper::processStereoSamples(const CSAMPLE* pInput, size_t inputStereoSamples) {
+bool DownmixAndOverlapHelper::processStereoSamples(const float* pInput, size_t inputStereoSamples) {
     const size_t numInputFrames = inputStereoSamples / 2;
     return processInner(pInput, numInputFrames);
 }
@@ -38,9 +36,9 @@ bool DownmixAndOverlapHelper::finalize() {
 }
 
 bool DownmixAndOverlapHelper::processInner(
-        const CSAMPLE* pInput, size_t numInputFrames) {
+        const float* pInput, size_t numInputFrames) {
     size_t inRead = 0;
-    double* pDownmix = m_buffer.data();
+    float* pDownmix = m_buffer.data();
 
     while (inRead < numInputFrames) {
         size_t readAvailable = numInputFrames - inRead;
@@ -83,5 +81,3 @@ bool DownmixAndOverlapHelper::processInner(
     }
     return true;
 }
-
-} // namespace mixxx

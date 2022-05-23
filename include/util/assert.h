@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QtDebug>
+//#include <QtDebug>
+#include <cstdio>
 
 static constexpr const char* kDebugAssertPrefix = "DEBUG ASSERT";
 
@@ -21,7 +22,7 @@ inline bool mixxx_debug_assert_return_true(const char* assertion,
 #endif
 
 inline void mixxx_release_assert(const char* assertion, const char* file, int line, const char* function) {
-    qFatal("ASSERT: \"%s\" in function %s at %s:%d", assertion, function, file, line);
+    printf("ASSERT: \"%s\" in function %s at %s:%d", assertion, function, file, line);
 }
 
 // These macros provide the demangled function name (including helpful template
