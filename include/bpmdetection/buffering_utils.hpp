@@ -11,7 +11,7 @@ class DownmixAndOverlapHelper {
  public:
   DownmixAndOverlapHelper() = default;
 
-  typedef std::function<bool(double* pBuffer, size_t frames)>
+  typedef std::function<bool(float* pBuffer, size_t frames)>
       WindowReadyCallback;
 
   bool initialize(
@@ -28,7 +28,7 @@ class DownmixAndOverlapHelper {
  private:
   bool processInner(const float* pInput, size_t numInputFrames);
 
-  std::vector<double> m_buffer;
+  std::vector<float> m_buffer;
   // The window size in frames.
   size_t m_windowSize = 0;
   // The number of frames to step the window forward on each output.

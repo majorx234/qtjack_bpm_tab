@@ -1,8 +1,9 @@
 #ifndef ANALYZERQUEENMARYBEATS_HPP_
 #define ANALYZERQUEENMARYBEATS_HPP_
 
-#include "analyzerplugin.hpp"
-#include "buffering_utils.hpp"
+#include "bpmdetection/analyzerplugin.hpp"
+#include "bpmdetection/buffering_utils.hpp"
+#include "bpmdetection/detection_function.hpp"
 #include <vector>
 #include <memory>
 

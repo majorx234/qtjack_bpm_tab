@@ -1,10 +1,10 @@
-#include <dsp/tempotracking/TempoTrackV2.h>
+#include "bpmdetection/TempoTrackV2.h"
 
 // Class header comes after library includes here since our preprocessor
 // definitions interfere with qm-dsp's headers.
-#include "analyzerqueenmarybeats.h"
+#include "bpmdetection/analyzerqueenmarybeats.hpp"
 
-#include "constants.h"
+#include "bpmdetection/constants.h"
 
 // This determines the resolution of the resulting BeatMap.
 // ~12 ms (86 Hz) is a fair compromise between accuracy and analysis speed,
@@ -47,10 +47,10 @@ bool AnalyzerQueenMaryBeats::initialize(unsigned int sampleRate) {
     m_windowSize = MathUtilities::nextPowerOfTwo(m_sampleRate / kMaximumBinSizeHz);
     m_pDetectionFunction = std::make_unique<DetectionFunction>(
             makeDetectionFunctionConfig(m_stepSizeFrames, m_windowSize));
-    qDebug() << "input sample rate is " << m_sampleRate << ", step size is " << m_stepSizeFrames;
+    //qDebug() << "input sample rate is " << m_sampleRate << ", step size is " << m_stepSizeFrames;
 
     m_helper.initialize(
-            m_windowSize, m_stepSizeFrames, [this](double* pWindow, size_t) {
+            m_windowSize, m_stepSizeFrames, [this](float* pWindow, size_t) {
                 // TODO(rryan) reserve?
                 m_detectionResults.push_back(
                         m_pDetectionFunction->processTimeDomain(pWindow));
@@ -59,8 +59,8 @@ bool AnalyzerQueenMaryBeats::initialize(unsigned int sampleRate) {
     return true;
 }
 
-bool AnalyzerQueenMaryBeats::processSamples(const CSAMPLE* pIn, const int iLen) {
-    DEBUG_ASSERT(iLen % kAnalysisChannels == 0);
+bool AnalyzerQueenMaryBeats::processSamples(const float* pIn, const int iLen) {
+    //DEBUG_ASSERT(iLen % kAnalysisChannels == 0);
     if (!m_pDetectionFunction) {
         return false;
     }

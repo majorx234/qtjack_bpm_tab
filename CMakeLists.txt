@@ -70,7 +70,7 @@ set(DETECTION_FUNCTION_HEADERS
 )
 add_library(detection_function)
 target_sources(detection_function
-  PRIVATE  ${DETECTION_FUNCTION_HEADERS}
+  PRIVATE ${DETECTION_FUNCTION_SOURCES}
   PUBLIC ${DETECTION_FUNCTION_HEADERS}
 )
 target_include_directories(detection_function PRIVATE 
@@ -88,7 +88,7 @@ set(TEMPO_TRACKV2_HEADERS
 )
 add_library(tempo_track_v2)
 target_sources(tempo_track_v2
-  PRIVATE  ${TEMPO_TRACKV2_HEADERS}
+  PRIVATE  ${TEMPO_TRACKV2_SOURCES}
   PUBLIC ${TEMPO_TRACKV2_HEADERS}
 )
 target_include_directories(tempo_track_v2 PRIVATE 
@@ -133,7 +133,7 @@ set(ANALYZER_QUEEN_MARY_BEATS_HEADERS
 
 add_library(analyzerqueenmarybeats)
 target_sources(analyzerqueenmarybeats
-  PRIVATE  ${ANALYZER_QUEEN_MARY_BEATS_HEADERS}
+  PRIVATE  ${ANALYZER_QUEEN_MARY_BEATS_SOURCES}
   PUBLIC ${ANALYZER_QUEEN_MARY_BEATS_HEADERS}
 )
 target_include_directories(analyzerqueenmarybeats PRIVATE 
@@ -145,6 +145,7 @@ target_link_libraries(analyzerqueenmarybeats
   phase_vocoder
   tempo_track_v2
   buffering_utils
+  detection_function
 )
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
@@ -267,6 +268,7 @@ target_link_libraries(bpm_tab PRIVATE
   avrg_queue
   wave_widget
   Threads::Threads
+  analyzerqueenmarybeats
 )
 
 add_executable(bpm_tab_main)

@@ -34,7 +34,7 @@
 #define FLOOR                   floorf
 #define TRUNC                   truncf
 
-typedef std::complex<double> ComplexData;
+typedef std::complex<float> ComplexData;
 
 /* aliases to complex.h functions */
 /** sample = EXPC(complex) */
