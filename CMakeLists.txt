@@ -277,7 +277,6 @@ target_sources(bpm_tab_main
   PRIVATE ${BPM_TAB_MAIN_MOCrcs}
   PUBLIC ${BPM_TAB_MAIN_SOURCES}
 )
-
 target_include_directories(bpm_tab_main PRIVATE include)
 target_include_directories(bpm_tab_main PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(bpm_tab_main SYSTEM
@@ -285,7 +284,7 @@ target_include_directories(bpm_tab_main SYSTEM
   qtjack::qtjack
   ${JACK_INCLUDE_DIRS}
   ${Qt5Core_INCLUDE_DIRS}
-  ${Qt5Widgets_INCLUDE_DIRS}4
+  ${Qt5Widgets_INCLUDE_DIRS}
 )
 
 target_link_libraries(bpm_tab_main
@@ -295,3 +294,9 @@ target_link_libraries(bpm_tab_main
   qtjack::qtjack
   bpm_tab
 )
+
+add_executable(super_cicular_buffer_test)
+target_sources(super_cicular_buffer_test
+  PRIVATE src/test/super_circular_buffer_test.cpp
+)
+target_include_directories(super_cicular_buffer_test PRIVATE include)
