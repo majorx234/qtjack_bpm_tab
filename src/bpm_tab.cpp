@@ -55,6 +55,7 @@ BpmTab::BpmTab(QWidget *parent)
     waveHbox->addWidget(wave_widget);
     bpm_tab_ui->waveBox->setLayout(waveHbox);
     _qm_beat_detection = new AnalyzerQueenMaryBeats();
+    _qm_beat_detection->initialize(48000);
     setupJackClient();
     connect(this, &BpmTab::setBpm,
             this->bpm_tab_ui->bpmLabel, &QLabel::setText);
@@ -206,6 +207,7 @@ void BpmTab::audio_process_fct() {
                    ring_buffer_left_size : _audio_buffer_size;
   // norm to 1014
   max_elemets[1] = 1024*(max_elemets[1] / 1024);
+  // copy data from ringbuffer to audio buffer
   int s1 = _audio_ring_buffer[1].read(_audio_buffer[1], max_elemets[1]);
 
   // Process read data here _audio_buffer[*]
