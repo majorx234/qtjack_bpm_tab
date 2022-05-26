@@ -42,6 +42,7 @@ BpmTab::BpmTab(QWidget *parent)
   , alive(true)
   , _audio_buffer_size(48000*30) // 30seconds audiobuffer
   , _new_samples_in_audio_buffer(0)
+  , super_circular_buffer{SuperCircularBuffer<float>(300,1024),SuperCircularBuffer<float>(300,1024)}    
 {
   _audio_buffer[0] =
       (QtJack::AudioSample*)malloc(_audio_buffer_size
@@ -198,14 +199,14 @@ void BpmTab::audio_process_fct() {
   //need to copy, not more than buffer size
   max_elemets[0] = ring_buffer_right_size < _audio_buffer_size ?
                    ring_buffer_right_size : _audio_buffer_size;
-  // norm to 1014
+  // norm to 1024
   max_elemets[0] = 1024*(max_elemets[0] / 1024);
   int s0 = _audio_ring_buffer[0].read(_audio_buffer[0], max_elemets[0]);
 
   //need to copy, not more than buffer size
   max_elemets[1] = ring_buffer_left_size < _audio_buffer_size ?
                    ring_buffer_left_size : _audio_buffer_size;
-  // norm to 1014
+  // norm to 1024
   max_elemets[1] = 1024*(max_elemets[1] / 1024);
   // copy data from ringbuffer to audio buffer
   int s1 = _audio_ring_buffer[1].read(_audio_buffer[1], max_elemets[1]);
@@ -231,6 +232,8 @@ void BpmTab::audio_process_fct() {
       limits[3] = 0;
     }
   }
+  super_circular_buffer[0].add_chunk(_audio_buffer[0]);
+  super_circular_buffer[1].add_chunk(_audio_buffer[1]);
 }
 
 void BpmTab::on_tab_button() {

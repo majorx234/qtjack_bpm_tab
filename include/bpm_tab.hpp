@@ -38,10 +38,10 @@
 #include <RingBuffer>
 #include <MidiMsg>
 
-#include "bpmdetection/analyzerplugin.hpp"
-
 #include "avrg_queue.hpp"
 #include "wave_widget.hpp"
+#include "super_circular_buffer.hpp"
+#include "bpmdetection/analyzerplugin.hpp"
 
 namespace Ui {
 class BpmTab;
@@ -101,6 +101,7 @@ class BpmTab : public QWidget, public QtJack::Processor {
   std::condition_variable audio_chunk_cv;
   std::mutex audio_mutex;
   AnalyzerBeatsPlugin* _qm_beat_detection;
+  SuperCircularBuffer<float> super_circular_buffer[2];
 };
 
 #endif // BPM_TAB_HPP_
