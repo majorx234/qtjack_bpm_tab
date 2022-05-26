@@ -51,7 +51,9 @@ make
   
 
 ## History
-- 2021-05-21 Add Visualization fo Jack Input
+- 2022-05-26 Add Super Circular Buffer structure to have circular buffer with continously data
+- 2022-05-23 Modify QM bpm detection for use in bpm_tab widget
+- 2022-05-21 Add Visualization fo Jack Input
 - 2022-05-20 Now timing behavior is accurate
 - 2022-05-19 switch to own repo
 - 2022-04-14 first version sending periodic Midi messsages
