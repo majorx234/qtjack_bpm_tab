@@ -59,13 +59,13 @@ BpmTab::BpmTab(QWidget *parent)
     _qm_beat_detection = new AnalyzerQueenMaryBeats();
     _qm_beat_detection->initialize(48000);
     setupJackClient();
-    connect(this, &BpmTab::setBpm,
+    connect(this, &BpmTab::on_set_bpm,
             this->bpm_tab_ui->bpmLabel, &QLabel::setText);
     connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked,
-            this, &BpmTab::on_tab_button);
-    connect(this, &BpmTab::trigger_midi_msg_send,
-            this, &BpmTab::on_midi_message_send, Qt::QueuedConnection);
-    connect(this, &BpmTab::limits_ready, wave_widget, &WaveWidget::setChunk);
+            this, &BpmTab::tab);
+    connect(this, &BpmTab::on_midi_message_send,
+            this, &BpmTab::midi_message_send, Qt::QueuedConnection);
+    connect(this, &BpmTab::on_limits_ready, wave_widget, &WaveWidget::setChunk);
     connect(this, &BpmTab::on_buffer_ready_to_calc_bpm, 
             this, &BpmTab::calc_bpm);
 
@@ -98,11 +98,11 @@ void BpmTab::setupJackClient() {
   _client.activate();
 }
 
-void BpmTab::midi_message_send() {
+void BpmTab::midi_message_send_thread_fct() {
   //thread function
   while (alive) {
     if (started) {
-      emit trigger_midi_msg_send(true);
+      emit on_midi_message_send();
     }
     int ms = 60000 / bpm;
     //ToDo: need syncing with conditional variable here + timeout
@@ -110,9 +110,9 @@ void BpmTab::midi_message_send() {
   }
 }
 
-void BpmTab::on_midi_message_send(bool note_on_off) {
+void BpmTab::midi_message_send() {
   int t1 = _client.getJackTime();
-  int t2 = t1+(100*48000/1000);  //+20ms in samples
+  int t2 = t1+(100*48000/1000);  //+100ms in samples
   QtJack::MidiMsg note_on,note_off;
 
   note_on.midiData[0] = 0x91;
@@ -228,7 +228,7 @@ void BpmTab::audio_process_fct() {
       limits[2*1+1] = _audio_buffer[1][j];
     }
     if(j%128 == 127) {
-      emit limits_ready(limits[0],limits[1],limits[2],limits[3]);
+      emit on_limits_ready(limits[0],limits[1],limits[2],limits[3]);
       limits[0] = 0;
       limits[1] = 0;
       limits[2] = 0;
@@ -244,7 +244,7 @@ void BpmTab::audio_process_fct() {
 
 }
 
-void BpmTab::on_tab_button() {
+void BpmTab::tab() {
   printf("button tabed\n");
   std::chrono::steady_clock::time_point new_timestamp =
       std::chrono::steady_clock::now();
@@ -269,7 +269,7 @@ void BpmTab::on_tab_button() {
   double bpm_avg = 60000 / avrg_milliseconds;
   bpm = int(bpm_avg * 100 + 0.5)/ 100.0;
   count++;
-  emit setBpm(QString::number(bpm));
+  emit on_set_bpm(QString::number(bpm));
   if(!started)
     started = true;
   }
