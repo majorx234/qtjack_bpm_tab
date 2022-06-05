@@ -77,6 +77,7 @@ class BpmTab : public QWidget, public QtJack::Processor {
   QtJack::Client _client;
   QtJack::MidiPort _midi_out;
   QtJack::MidiMsgRingBuffer _midi_out_buffer;
+  unsigned int _sample_rate;
   jack_nframes_t last_frame_time;
   QtJack::AudioPort _audio_in_port[2];
   QtJack::AudioRingBuffer _audio_ring_buffer[2];

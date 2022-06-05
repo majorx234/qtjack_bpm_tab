@@ -33,6 +33,7 @@ BpmTab::BpmTab(QWidget *parent)
   : QWidget(parent)
   , Processor(_client)
   , bpm_tab_ui(new Ui::BpmTab)
+  , _sample_rate(48000)
   , first_tab(true)
   , started(false)
   , max_wait(5000)
@@ -41,37 +42,32 @@ BpmTab::BpmTab(QWidget *parent)
   , count(0)
   , avrg_queue(8)
   , alive(true)
-  , _audio_buffer_size(48000*30) // 30seconds audiobuffer
+  , _audio_buffer_size(48000*30) // default, but will reset in setupJackClient
   , _new_samples_in_audio_buffer(0)
   , super_circular_buffer{SuperCircularBuffer<float>(300,1024),SuperCircularBuffer<float>(300,1024)}    
 {
-  _audio_buffer[0] =
-      (QtJack::AudioSample*)malloc(_audio_buffer_size
-                                   * sizeof(QtJack::AudioSample));
-  _audio_buffer[1] =
-      (QtJack::AudioSample*)malloc(_audio_buffer_size
-                                   * sizeof(QtJack::AudioSample));
   bpm_tab_ui->setupUi(this);
-    wave_widget = new WaveWidget(parent);
-    QHBoxLayout *waveHbox = new QHBoxLayout(parent);
-    waveHbox->addWidget(wave_widget);
-    bpm_tab_ui->waveBox->setLayout(waveHbox);
-    _qm_beat_detection = new AnalyzerQueenMaryBeats();
-    _qm_beat_detection->initialize(48000);
-    setupJackClient();
-    connect(this, &BpmTab::on_set_bpm,
-            this->bpm_tab_ui->bpmLabel, &QLabel::setText);
-    connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked,
-            this, &BpmTab::tab);
-    connect(this, &BpmTab::on_midi_message_send,
-            this, &BpmTab::midi_message_send, Qt::QueuedConnection);
-    connect(this, &BpmTab::on_limits_ready, wave_widget, &WaveWidget::setChunk);
-    connect(this, &BpmTab::on_buffer_ready_to_calc_bpm, 
-            this, &BpmTab::calc_bpm);
+  wave_widget = new WaveWidget(parent);
+  QHBoxLayout *waveHbox = new QHBoxLayout(parent);
+  waveHbox->addWidget(wave_widget);
+  bpm_tab_ui->waveBox->setLayout(waveHbox);
+  setupJackClient();
+  _qm_beat_detection = new AnalyzerQueenMaryBeats();
+  _qm_beat_detection->initialize(_sample_rate);
+  connect(this, &BpmTab::on_set_bpm,
+          this->bpm_tab_ui->bpmLabel, &QLabel::setText);
+  connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked,
+          this, &BpmTab::tab);
+  connect(this, &BpmTab::on_midi_message_send,
+          this, &BpmTab::midi_message_send, Qt::QueuedConnection);
+  connect(this, &BpmTab::on_limits_ready, 
+          wave_widget, &WaveWidget::setChunk);
+  connect(this, &BpmTab::on_buffer_ready_to_calc_bpm, 
+          this, &BpmTab::calc_bpm);
 
-    //thread to generate periodic midimsgs
-    cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
-    startTimer(50);
+  //thread to generate periodic midimsgs
+  cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
+  startTimer(50);
 }
 
 BpmTab::~BpmTab() {
@@ -83,12 +79,20 @@ BpmTab::~BpmTab() {
 
 void BpmTab::setupJackClient() {
   _client.connectToServer("BpmTab");
+  _sample_rate = _client.sampleRate();
   // midi port
   _midi_out = _client.registerMidiOutPort("out_1");
 
-  // ToDo size should be dependend on samplerate
-  _midi_out_buffer = QtJack::MidiMsgRingBuffer(5*48000);
+  _midi_out_buffer = QtJack::MidiMsgRingBuffer(1024);
 
+  // 30 seconds audiobuffer
+  _audio_buffer_size = _sample_rate *30; 
+  _audio_buffer[0] =
+      (QtJack::AudioSample*)malloc(_audio_buffer_size
+                                   * sizeof(QtJack::AudioSample));
+  _audio_buffer[1] =
+      (QtJack::AudioSample*)malloc(_audio_buffer_size
+                                   * sizeof(QtJack::AudioSample));
   // audio port
   _audio_in_port[0] = _client.registerAudioInPort("in 1");
   _audio_in_port[1] = _client.registerAudioInPort("in 2");
@@ -112,7 +116,7 @@ void BpmTab::midi_message_send_thread_fct() {
 
 void BpmTab::midi_message_send() {
   int t1 = _client.getJackTime();
-  int t2 = t1+(100*48000/1000);  //+100ms in samples
+  int t2 = t1+((100*_sample_rate)/1000);  //+100ms in samples
   QtJack::MidiMsg note_on,note_off;
 
   note_on.midiData[0] = 0x91;
