@@ -61,10 +61,12 @@ class BpmTab : public QWidget, public QtJack::Processor {
   void trigger_midi_msg_send(bool);
   void jack_tick();
   void limits_ready(float,float,float,float);
+  void on_buffer_ready_to_calc_bpm();
 
  protected slots:
   void on_tab_button();
   void on_midi_message_send(bool);
+  void calc_bpm();
 
  protected:
   void timerEvent(QTimerEvent*) override;
@@ -93,6 +95,7 @@ class BpmTab : public QWidget, public QtJack::Processor {
   bool started;
   unsigned int max_wait;
   unsigned int count;
+  unsigned int chunk_counter_;
   double bpm = 0;
   AvrgQueue avrg_queue;
   std::thread cyclic_midi_msgs_sender;

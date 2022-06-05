@@ -36,6 +36,7 @@ BpmTab::BpmTab(QWidget *parent)
   , first_tab(true)
   , started(false)
   , max_wait(5000)
+  , chunk_counter_(0)
   , bpm(120)
   , count(0)
   , avrg_queue(8)
@@ -65,6 +66,8 @@ BpmTab::BpmTab(QWidget *parent)
     connect(this, &BpmTab::trigger_midi_msg_send,
             this, &BpmTab::on_midi_message_send, Qt::QueuedConnection);
     connect(this, &BpmTab::limits_ready, wave_widget, &WaveWidget::setChunk);
+    connect(this, &BpmTab::on_buffer_ready_to_calc_bpm, 
+            this, &BpmTab::calc_bpm);
 
     //thread to generate periodic midimsgs
     cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
@@ -234,6 +237,11 @@ void BpmTab::audio_process_fct() {
   }
   super_circular_buffer[0].add_chunk(_audio_buffer[0]);
   super_circular_buffer[1].add_chunk(_audio_buffer[1]);
+  if(chunk_counter_ > 300 && (chunk_counter_ % 46 == 0)) {
+    emit on_buffer_ready_to_calc_bpm();
+  }
+  chunk_counter_++;
+
 }
 
 void BpmTab::on_tab_button() {
@@ -267,4 +275,8 @@ void BpmTab::on_tab_button() {
   }
   last_timestamp = new_timestamp;
   return;
+}
+
+void BpmTab::calc_bpm(){
+  printf("calc_bpm() triggered, chunk_counter_: %d\n",chunk_counter_);
 }
