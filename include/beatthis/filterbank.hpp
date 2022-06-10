@@ -13,7 +13,9 @@ class Filterbank{
   Filterbank(size_t samples,
              unsigned int sample_rate);
   ~Filterbank();
-  float* filter_signal(float* signal,std::vector<unsigned int> bandlimits,unsigned int max_freq);
+  float** filter_signal(float* signal,
+    std::vector<unsigned int> bandlimits = {0,200,400,800,1600,3200 },
+    unsigned int max_freq = 4096);
  private:
   void calculate_window_fct();
   size_t samples_;

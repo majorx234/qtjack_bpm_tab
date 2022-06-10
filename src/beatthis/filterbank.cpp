@@ -1,5 +1,6 @@
 #include <math.h>
 #include <cassert>
+#include <cstring>
 #include "beatthis/filterbank.hpp"
 
 Filterbank::Filterbank(size_t samples,
@@ -26,7 +27,9 @@ Filterbank::~Filterbank() {
   fftw_free(result_);
 }
 
-float* Filterbank::filter_signal(float* in_buffer,std::vector<unsigned int> bandlimits,unsigned int max_freq){
+float** Filterbank::filter_signal(float* in_buffer,
+  std::vector<unsigned int> bandlimits,
+  unsigned int max_freq){
   for(int i = 0;i<samples_;i++) {
     signal_[i][0] = window_[i] * static_cast<double>(in_buffer[i]);
     signal_[i][1] = 0;
@@ -36,7 +39,32 @@ float* Filterbank::filter_signal(float* in_buffer,std::vector<unsigned int> band
     work_[i] = sqrt(result_[i][0] * result_[i][0] +
                     result_[i][1] * result_[i][1]);
   }
-  return nullptr;
+  unsigned int nbands = bandlimits.size();
+  float** output = (float**)malloc(nbands*sizeof(float*));
+  for(int i =0;i<nbands;i++) {
+    output[i] = (float*)malloc((samples_)*sizeof(float*));
+    memset(output[i],0,(samples_)*sizeof(float*));
+  }
+
+  unsigned int bl[nbands];
+  unsigned int br[nbands];
+  
+  for (int i = 0; i < nbands-1; ++i)
+  {
+    bl[i] = floor((bandlimits[i]/max_freq)*(samples_/2));
+    br[i] = floor((bandlimits[i+1]/max_freq)*(samples_/2))-1;
+  }
+  bl[nbands-1] = floor((bandlimits[nbands-1]/max_freq)*(samples_/2));
+  br[nbands-1] = floor(samples_/2);
+
+  for(int i =0;i<nbands;i++) {
+    for(int j = bl[i];j < br[i];j++) {
+      output[i][j] = work_[j];
+      output[i][(samples_-1)-j] = work_[(samples_-1)-j];
+    }
+  }
+
+  return output;
 }
 
 void Filterbank::calculate_window_fct()
