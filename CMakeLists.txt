@@ -14,6 +14,8 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package( qtjack REQUIRED)
 find_package(Threads REQUIRED)
+find_package(PkgConfig)
+pkg_check_modules(FFTW3 REQUIRED fftw3)
 
 ####### FFT #######
 set(FFT_SOURCES
@@ -160,6 +162,15 @@ set(AVRG_QUEUE_TEST_SOURCES
   src/test/avrg_queue_test.cpp
 )
 
+set(FILTERBANK_SOURCES
+  src/beatthis/filterbank.cpp)
+
+set(FILTERBANK_HEADERS
+  include/beatthis/filterbank.hpp)
+
+set(FILTERBANK_TEST_SOURCES
+  src/test/filterbank_test.cpp)
+
 set(WAVE_WIDGET_SOURCES
   src/wave_widget.cpp
   include/wave_widget.hpp
@@ -212,6 +223,21 @@ target_sources(avrg_queue_test
 target_include_directories(avrg_queue_test PRIVATE include)
 target_link_libraries(avrg_queue_test
   avrg_queue
+)
+
+add_library(filterbank)
+target_sources(filterbank
+  PRIVATE  ${FILTERBANK_SOURCES}
+  PUBLIC ${FILTERBANK_HEADERS}
+)
+target_include_directories(filterbank 
+PRIVATE 
+  include
+  ${FFTW3_INCLUDE_DIRS}
+)
+target_link_libraries(filterbank
+PRIVATE
+  ${FFTW3_LIBRARIES}
 )
 
 add_library(wave_widget
