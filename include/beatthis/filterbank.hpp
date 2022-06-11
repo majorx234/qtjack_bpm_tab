@@ -22,10 +22,13 @@ class Filterbank{
   unsigned int sample_rate_;
   WindowFct window_fct_;
   double* window_;
-  double* work_;
+  fftw_complex* work_;
   fftw_complex* signal_;
   fftw_complex* result_;
-  fftw_plan p_;
+  fftw_complex* freqdomain_signal_;
+  fftw_complex* timedomain_result_;
+  fftw_plan plan_forward_;
+  fftw_plan plan_backward_;
 };
 
 #endif // FILTERBANK_HPP_

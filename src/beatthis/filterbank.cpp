@@ -12,19 +12,28 @@ Filterbank::Filterbank(size_t samples,
   , work_(nullptr)
 {
   window_ = fftw_alloc_real(samples);
-  work_ = fftw_alloc_real(samples);
+  work_ = fftw_alloc_complex(samples);
   signal_ = fftw_alloc_complex(samples);
   result_ = fftw_alloc_complex(samples);
-  p_ = fftw_plan_dft_1d(samples, signal_, result_, FFTW_FORWARD, FFTW_ESTIMATE);
+  freqdomain_signal_ = fftw_alloc_complex(samples);
+  timedomain_result_ = fftw_alloc_complex(samples);
+  plan_forward_ = fftw_plan_dft_1d(samples, signal_, result_, 
+                                   FFTW_FORWARD, FFTW_ESTIMATE);
+  plan_backward_ = fftw_plan_dft_1d(samples, freqdomain_signal_, timedomain_result_,
+                                    FFTW_BACKWARD, FFTW_ESTIMATE);
   calculate_window_fct();
 
 }
 
 Filterbank::~Filterbank() {
-  fftw_destroy_plan(p_);
+  fftw_free(work_);
   fftw_free(window_);
   fftw_free(signal_);
   fftw_free(result_);
+  fftw_free(freqdomain_signal_);
+  fftw_free(timedomain_result_);
+  fftw_destroy_plan(plan_forward_);
+  fftw_destroy_plan(plan_backward_);
 }
 
 float** Filterbank::filter_signal(float* in_buffer,
@@ -34,18 +43,19 @@ float** Filterbank::filter_signal(float* in_buffer,
     signal_[i][0] = window_[i] * static_cast<double>(in_buffer[i]);
     signal_[i][1] = 0;
   }
-  fftw_execute(p_);
+  fftw_execute(plan_forward_);
   for(int i = 0;i<samples_;i++) {
-    work_[i] = sqrt(result_[i][0] * result_[i][0] +
-                    result_[i][1] * result_[i][1]);
+    work_[i][0] = result_[i][0];
+    work_[i][1] = result_[i][1];
   }
+
   unsigned int nbands = bandlimits.size();
   float** output = (float**)malloc(nbands*sizeof(float*));
   for(int i =0;i<nbands;i++) {
     output[i] = (float*)malloc((samples_)*sizeof(float*));
     memset(output[i],0,(samples_)*sizeof(float*));
   }
-
+  
   unsigned int bl[nbands];
   unsigned int br[nbands];
   
@@ -58,12 +68,20 @@ float** Filterbank::filter_signal(float* in_buffer,
   br[nbands-1] = floor(samples_/2);
 
   for(int i =0;i<nbands;i++) {
+    for(int j = 0;j<samples_;j++) {
+      freqdomain_signal_[j][0] = 0;
+      freqdomain_signal_[j][1] = 0;
+    }
     for(int j = bl[i];j < br[i];j++) {
-      output[i][j] = work_[j];
-      output[i][(samples_-1)-j] = work_[(samples_-1)-j];
+      freqdomain_signal_[j][0] = work_[j][0];
+      freqdomain_signal_[j][1] = work_[j][1];
+    }
+    fftw_execute(plan_backward_);
+    for(int j = 0;j<samples_;j++) {
+      output[i][j] = sqrt(timedomain_result_[j][0] * timedomain_result_[i][0] +
+                          timedomain_result_[i][1] * timedomain_result_[i][1]);
     }
   }
-
   return output;
 }
 
@@ -80,7 +98,7 @@ void Filterbank::calculate_window_fct()
         x = 0.5 * (1 - cos((2 * M_PI * i) / (samples_ - 1)));
         break;
       default:
-          assert(false);
+        assert(false);
     }
     window_[i] = x;
   }
