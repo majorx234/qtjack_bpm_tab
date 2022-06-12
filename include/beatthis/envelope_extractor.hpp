@@ -21,11 +21,25 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef ENVELOPE_EXTRACTOR_HPP_
+#define ENVELOPE_EXTRACTOR_HPP_
+
+#include <fftw3.h>
+
 class EnvelopeExtractor
 {
 public:
   EnvelopeExtractor(size_t samples,
                    unsigned int sample_rate);
   ~EnvelopeExtractor();
+  void calculate_hann_window_fct(unsigned int window_length,
+                                 unsigned int max_freq);
+  float** extract_envelope(double**);
+private:
+  size_t samples_;
+  unsigned int sample_rate_;
 
+  double* hann_window_;
 };
+
+#endif // ENVELOPE_EXTRACTOR_HPP_

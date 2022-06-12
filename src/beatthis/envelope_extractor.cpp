@@ -21,17 +21,35 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#include "envelope_extractor.hpp"
-
-
+#include <math.h>
+#include <cassert>
+#include <cstring>
+#include "beatthis/envelope_extractor.hpp"
 
 EnvelopeExtractor::EnvelopeExtractor(size_t samples,
                    unsigned int sample_rate)
   : samples_(samples)
   , sample_rate_(sample_rate)
 {
+  hann_window_ = fftw_alloc_real(samples);
+
 }
 
 EnvelopeExtractor::~EnvelopeExtractor(){
+  fftw_free(hann_window_);
+}
+
+void EnvelopeExtractor::calculate_hann_window_fct(
+  unsigned int window_length,
+  unsigned int max_freq)
+{
+  unsigned int hann_length = window_length*2*max_freq;
+  for (int i=0;i<samples_;i++) {
+    hann_window_[i] = 0;
+  }
+  assert(hann_length<samples_);
+  for (int i = 0; i < hann_length; ++i)
+  {
+    hann_window_[i] = sin((M_PI * i) / (hann_length/2));
+  }
 }

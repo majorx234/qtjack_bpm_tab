@@ -150,6 +150,51 @@ target_link_libraries(analyzerqueenmarybeats
   buffering_utils
   detection_function
 )
+####### Beattetection BeatThis #######
+set(FILTERBANK_SOURCES
+  src/beatthis/filterbank.cpp)
+
+set(FILTERBANK_HEADERS
+  include/beatthis/filterbank.hpp)
+
+set(FILTERBANK_TEST_SOURCES
+  src/test/filterbank_test.cpp)
+
+set(ENVELOPE_EXTRACTOR_SOURCES
+  src/beatthis/envelope_extractor.cpp)
+
+set(ENVELOPE_EXTRACTOR_HEADERS
+  include/beatthis/envelope_extractor.hpp)
+
+add_library(filterbank)
+target_sources(filterbank
+  PRIVATE  ${FILTERBANK_SOURCES}
+  PUBLIC ${FILTERBANK_HEADERS}
+)
+target_include_directories(filterbank 
+PRIVATE 
+  include
+  ${FFTW3_INCLUDE_DIRS}
+)
+target_link_libraries(filterbank
+PRIVATE
+  ${FFTW3_LIBRARIES}
+)
+
+add_library(envelope_extractor)
+target_sources(envelope_extractor
+  PRIVATE  ${ENVELOPE_EXTRACTOR_SOURCES}
+  PUBLIC ${ENVELOPE_EXTRACTOR_HEADERS}
+)
+target_include_directories(envelope_extractor 
+PRIVATE 
+  include
+  ${FFTW3_INCLUDE_DIRS}
+)
+target_link_libraries(envelope_extractor
+PRIVATE
+  ${FFTW3_LIBRARIES}
+)
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp
@@ -161,15 +206,6 @@ set(AVRG_QUEUE_HEADERS
 set(AVRG_QUEUE_TEST_SOURCES
   src/test/avrg_queue_test.cpp
 )
-
-set(FILTERBANK_SOURCES
-  src/beatthis/filterbank.cpp)
-
-set(FILTERBANK_HEADERS
-  include/beatthis/filterbank.hpp)
-
-set(FILTERBANK_TEST_SOURCES
-  src/test/filterbank_test.cpp)
 
 set(WAVE_WIDGET_SOURCES
   src/wave_widget.cpp
@@ -223,21 +259,6 @@ target_sources(avrg_queue_test
 target_include_directories(avrg_queue_test PRIVATE include)
 target_link_libraries(avrg_queue_test
   avrg_queue
-)
-
-add_library(filterbank)
-target_sources(filterbank
-  PRIVATE  ${FILTERBANK_SOURCES}
-  PUBLIC ${FILTERBANK_HEADERS}
-)
-target_include_directories(filterbank 
-PRIVATE 
-  include
-  ${FFTW3_INCLUDE_DIRS}
-)
-target_link_libraries(filterbank
-PRIVATE
-  ${FFTW3_LIBRARIES}
 )
 
 add_library(wave_widget
