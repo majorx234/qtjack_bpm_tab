@@ -33,12 +33,13 @@ public:
   EnvelopeExtractor(size_t samples,
                    unsigned int sample_rate);
   ~EnvelopeExtractor();
-  void calculate_halfhann_window_fct(unsigned int window_length,
-                                 unsigned int max_freq);
   float** extract_envelope(float** in_signals,
                            std::vector<unsigned int> bandlimits,
-                           unsigned int max_freq);
+                           unsigned int maxfreq = 4096,
+                           double window_length = 0.4);
 private:
+  void calculate_halfhann_window_fct(double window_length = 0.4,
+                                     unsigned int maxfreq = 4096);
   size_t samples_;
   unsigned int sample_rate_;
 

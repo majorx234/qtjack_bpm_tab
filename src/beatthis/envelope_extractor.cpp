@@ -49,19 +49,25 @@ EnvelopeExtractor::~EnvelopeExtractor(){
 }
 
 void EnvelopeExtractor::calculate_halfhann_window_fct(
-  unsigned int window_length,
+  double window_length,
   unsigned int max_freq)
 {
-  unsigned int hann_length = window_length*2*max_freq;
+  unsigned int hann_length = static_cast<unsigned int>(window_length*2*max_freq);
+
+  // have same length as input signal set to zero
   for (int i=0;i<samples_;i++) {
     signal_[i][0] = 0;
     signal_[i][1] = 0;
   }
   assert(hann_length<samples_);
+
+  // only part at start is set to half hann
   for (int i = 0; i < hann_length; ++i)
   {
     signal_[i][0] = 0.5-0.5*cos((M_PI * i) / hann_length);
   }
+
+  // calculate freq domain of half hann window
   fftw_execute(plan_forward_);
   for(int i = 0;i<samples_;i++) {
     hann_window_freq_[i][0] = result_[i][0];
@@ -71,14 +77,17 @@ void EnvelopeExtractor::calculate_halfhann_window_fct(
 
 float** EnvelopeExtractor::extract_envelope(float** in_signals,
                          std::vector<unsigned int> bandlimits,
-                         unsigned int max_freq) {
+                         unsigned int max_freq,
+                         double window_length) {
   unsigned int nbands = bandlimits.size();
 
+  // init data structures
   float** output = (float**)malloc(nbands*sizeof(float*));
   for(int i =0;i<nbands;i++) {
     output[i] = (float*)malloc((samples_)*sizeof(float*));
     memset(output[i],0,(samples_)*sizeof(float*));
   }
+  calculate_halfhann_window_fct(window_length, max_freq);
 
   for(int i = 0;i<nbands;i++) {
     // rectivy signal
@@ -90,6 +99,7 @@ float** EnvelopeExtractor::extract_envelope(float** in_signals,
     // convolute input signals with half hanning
     // can be done in frequency domain (convolution -> multiplication)
     for(int j = 0;j<samples_;j++) {
+      // complex multiplication
       freqdomain_signal_[j][0] = result_[j][0] * hann_window_freq_[j][0] - result_[j][1] * hann_window_freq_[j][1];
       freqdomain_signal_[j][1] = result_[j][0] * hann_window_freq_[j][1] + result_[j][1] * hann_window_freq_[j][0];
     }
