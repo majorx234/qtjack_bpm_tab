@@ -31,25 +31,73 @@ EnvelopeExtractor::EnvelopeExtractor(size_t samples,
   : samples_(samples)
   , sample_rate_(sample_rate)
 {
-  hann_window_ = fftw_alloc_real(samples);
-
+  hann_window_freq_ = fftw_alloc_complex(samples);
+  signal_ = fftw_alloc_complex(samples);
+  result_ = fftw_alloc_complex(samples);
+  freqdomain_signal_ = fftw_alloc_complex(samples);
+  timedomain_result_ = fftw_alloc_complex(samples);
 }
 
 EnvelopeExtractor::~EnvelopeExtractor(){
-  fftw_free(hann_window_);
+  fftw_free(hann_window_freq_);
+  fftw_free(signal_);
+  fftw_free(result_);
+  fftw_free(freqdomain_signal_);
+  fftw_free(timedomain_result_);
+  fftw_destroy_plan(plan_forward_);
+  fftw_destroy_plan(plan_backward_);
 }
 
-void EnvelopeExtractor::calculate_hann_window_fct(
+void EnvelopeExtractor::calculate_halfhann_window_fct(
   unsigned int window_length,
   unsigned int max_freq)
 {
   unsigned int hann_length = window_length*2*max_freq;
   for (int i=0;i<samples_;i++) {
-    hann_window_[i] = 0;
+    signal_[i][0] = 0;
+    signal_[i][1] = 0;
   }
   assert(hann_length<samples_);
   for (int i = 0; i < hann_length; ++i)
   {
-    hann_window_[i] = sin((M_PI * i) / (hann_length/2));
+    signal_[i][0] = 0.5-0.5*cos((M_PI * i) / hann_length);
   }
+  fftw_execute(plan_forward_);
+  for(int i = 0;i<samples_;i++) {
+    hann_window_freq_[i][0] = result_[i][0];
+    hann_window_freq_[i][1] = result_[i][1];
+  }
+}
+
+float** EnvelopeExtractor::extract_envelope(float** in_signals,
+                         std::vector<unsigned int> bandlimits,
+                         unsigned int max_freq) {
+  unsigned int nbands = bandlimits.size();
+
+  float** output = (float**)malloc(nbands*sizeof(float*));
+  for(int i =0;i<nbands;i++) {
+    output[i] = (float*)malloc((samples_)*sizeof(float*));
+    memset(output[i],0,(samples_)*sizeof(float*));
+  }
+
+  for(int i = 0;i<nbands;i++) {
+    // rectivy signal
+    for(int j = 0;j<samples_;j++) {
+      signal_[j][0] = std::abs(in_signals[i][j]);
+      signal_[j][1] = 0;
+    }
+    fftw_execute(plan_forward_);
+    // convolute input signals with half hanning
+    // can be done in frequency domain (convolution -> multiplication)
+    for(int j = 0;j<samples_;j++) {
+      freqdomain_signal_[j][0] = result_[j][0] * hann_window_freq_[j][0] - result_[j][1] * hann_window_freq_[j][1];
+      freqdomain_signal_[j][1] = result_[j][0] * hann_window_freq_[j][1] + result_[j][1] * hann_window_freq_[j][0];
+    }
+    fftw_execute(plan_forward_);
+    for(int j = 0;j<samples_;j++) {
+      output[i][j] = sqrt(timedomain_result_[j][0] * timedomain_result_[i][0] +
+                          timedomain_result_[i][1] * timedomain_result_[i][1]);
+    }
+  }
+  return output;
 }

@@ -24,6 +24,7 @@
 #ifndef ENVELOPE_EXTRACTOR_HPP_
 #define ENVELOPE_EXTRACTOR_HPP_
 
+#include <vector>
 #include <fftw3.h>
 
 class EnvelopeExtractor
@@ -32,14 +33,22 @@ public:
   EnvelopeExtractor(size_t samples,
                    unsigned int sample_rate);
   ~EnvelopeExtractor();
-  void calculate_hann_window_fct(unsigned int window_length,
+  void calculate_halfhann_window_fct(unsigned int window_length,
                                  unsigned int max_freq);
-  float** extract_envelope(double**);
+  float** extract_envelope(float** in_signals,
+                           std::vector<unsigned int> bandlimits,
+                           unsigned int max_freq);
 private:
   size_t samples_;
   unsigned int sample_rate_;
 
-  double* hann_window_;
+  fftw_complex* hann_window_freq_;
+  fftw_complex* signal_;
+  fftw_complex* result_;
+  fftw_complex* freqdomain_signal_;
+  fftw_complex* timedomain_result_;
+  fftw_plan plan_forward_;
+  fftw_plan plan_backward_;
 };
 
 #endif // ENVELOPE_EXTRACTOR_HPP_
