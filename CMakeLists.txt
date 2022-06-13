@@ -166,6 +166,12 @@ set(ENVELOPE_EXTRACTOR_SOURCES
 set(ENVELOPE_EXTRACTOR_HEADERS
   include/beatthis/envelope_extractor.hpp)
 
+set(DIFFERECTIFIER_SOURCES
+  src/beatthis/differectifier.cpp)
+
+set(DIFFERECTIFIER_HEADERS
+  include/beatthis/differectifier.hpp)
+
 add_library(filterbank)
 target_sources(filterbank
   PRIVATE  ${FILTERBANK_SOURCES}
@@ -192,6 +198,21 @@ PRIVATE
   ${FFTW3_INCLUDE_DIRS}
 )
 target_link_libraries(envelope_extractor
+PRIVATE
+  ${FFTW3_LIBRARIES}
+)
+
+add_library(differectifier)
+target_sources(differectifier
+  PRIVATE  ${DIFFERECTIFIER_SOURCES}
+  PUBLIC ${DIFFERECTIFIER_HEADERS}
+)
+target_include_directories(differectifier 
+PRIVATE 
+  include
+  ${FFTW3_INCLUDE_DIRS}
+)
+target_link_libraries(differectifier
 PRIVATE
   ${FFTW3_LIBRARIES}
 )
