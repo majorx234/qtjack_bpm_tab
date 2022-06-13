@@ -36,6 +36,11 @@ EnvelopeExtractor::EnvelopeExtractor(size_t samples,
   result_ = fftw_alloc_complex(samples);
   freqdomain_signal_ = fftw_alloc_complex(samples);
   timedomain_result_ = fftw_alloc_complex(samples);
+  plan_forward_ = fftw_plan_dft_1d(samples, signal_, result_, 
+                                   FFTW_FORWARD, FFTW_ESTIMATE);
+  plan_backward_ = fftw_plan_dft_1d(samples, freqdomain_signal_, timedomain_result_,
+                                    FFTW_BACKWARD, FFTW_ESTIMATE);
+
 }
 
 EnvelopeExtractor::~EnvelopeExtractor(){
