@@ -32,9 +32,15 @@ class Combfilter
 {
 public:
   Combfilter(size_t samples,
-                   unsigned int sample_rate);
+             unsigned int sample_rate);
   ~Combfilter();
 
+  unsigned int comb_convolute(float** signal,
+    float accuracy = 1.0,
+    float min_bpm = 60.0,
+    float max_bpm = 200.0,
+    std::vector<unsigned int> bandlimits = {0,200,400,800,1600,3200 },
+    unsigned int max_freq = 4096);
 private:  
   size_t samples_;
   unsigned int sample_rate_;

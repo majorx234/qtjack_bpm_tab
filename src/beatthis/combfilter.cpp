@@ -24,7 +24,10 @@
 #include "beatthis/combfilter.hpp"
 
 Combfilter::Combfilter(size_t samples,
-                   unsigned int sample_rate){
+                   unsigned int sample_rate)
+  : samples_(samples)
+  ,sample_rate_(sample_rate)
+{
   signal_ = fftw_alloc_complex(samples);
   result_ = fftw_alloc_complex(samples);
   freqdomain_signal_ = fftw_alloc_complex(samples);
@@ -43,4 +46,14 @@ Combfilter::~Combfilter() {
   fftw_free(timedomain_result_);
   fftw_destroy_plan(plan_forward_);
   fftw_destroy_plan(plan_backward_);
+}
+
+unsigned int Combfilter::comb_convolute(float** signal,
+    float accuracy,
+    float min_bpm,
+    float max_bpm,
+    std::vector<unsigned int> bandlimits,
+    unsigned int max_freq) {
+
+  unsigned int nbands = bandlimits.size();
 }
