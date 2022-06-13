@@ -172,6 +172,12 @@ set(DIFFERECTIFIER_SOURCES
 set(DIFFERECTIFIER_HEADERS
   include/beatthis/differectifier.hpp)
 
+set(COMBFILTER_SOURCES
+  src/beatthis/combfilter.cpp)
+
+set(COMBFILTER_HEADERS
+  include/beatthis/combfilter.hpp)
+
 add_library(filterbank)
 target_sources(filterbank
   PRIVATE  ${FILTERBANK_SOURCES}
@@ -212,7 +218,18 @@ PRIVATE
   include
   ${FFTW3_INCLUDE_DIRS}
 )
-target_link_libraries(differectifier
+
+add_library(combfilter)
+target_sources(combfilter
+  PRIVATE  ${COMBFILTER_SOURCES}
+  PUBLIC ${COMBFILTER_HEADERS}
+)
+target_include_directories(combfilter 
+PRIVATE 
+  include
+  ${FFTW3_INCLUDE_DIRS}
+)
+target_link_libraries(combfilter
 PRIVATE
   ${FFTW3_LIBRARIES}
 )
