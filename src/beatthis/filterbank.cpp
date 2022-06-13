@@ -59,9 +59,12 @@ Filterbank::~Filterbank() {
   fftw_destroy_plan(plan_backward_);
 }
 
+
 float** Filterbank::filter_signal(float* in_buffer,
   std::vector<unsigned int> bandlimits,
-  unsigned int max_freq){
+  unsigned int max_freq) {
+
+  // transform signal in frequency domain
   for(int i = 0;i<samples_;i++) {
     signal_[i][0] = window_[i] * static_cast<double>(in_buffer[i]);
     signal_[i][1] = 0;
@@ -72,6 +75,7 @@ float** Filterbank::filter_signal(float* in_buffer,
     work_[i][1] = result_[i][1];
   }
 
+  // create datastructure for nbands of the output signal
   unsigned int nbands = bandlimits.size();
   float** output = (float**)malloc(nbands*sizeof(float*));
   for(int i =0;i<nbands;i++) {
@@ -82,6 +86,7 @@ float** Filterbank::filter_signal(float* in_buffer,
   unsigned int bl[nbands];
   unsigned int br[nbands];
   
+  // calculate limits of filterbank
   for (int i = 0; i < nbands-1; ++i)
   {
     bl[i] = floor((bandlimits[i]/max_freq)*(samples_/2));
@@ -91,14 +96,17 @@ float** Filterbank::filter_signal(float* in_buffer,
   br[nbands-1] = floor(samples_/2);
 
   for(int i =0;i<nbands;i++) {
+    // set freq domain to zero
     for(int j = 0;j<samples_;j++) {
       freqdomain_signal_[j][0] = 0;
       freqdomain_signal_[j][1] = 0;
     }
+    // add only freq domain in limits of filterband
     for(int j = bl[i];j < br[i];j++) {
       freqdomain_signal_[j][0] = work_[j][0];
       freqdomain_signal_[j][1] = work_[j][1];
     }
+    // backtransformation of bands in time domain
     fftw_execute(plan_backward_);
     for(int j = 0;j<samples_;j++) {
       output[i][j] = sqrt(timedomain_result_[j][0] * timedomain_result_[i][0] +
