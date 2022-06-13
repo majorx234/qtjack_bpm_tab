@@ -55,3 +55,6 @@ notes*.txt
 
 # backup files
 *.bkp
+
+#folder with ideas schemes and unused soucefiles
+material/
