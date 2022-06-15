@@ -21,6 +21,9 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <cstdlib>
+#include <cstring>
+#include <cmath>
 #include "beatthis/combfilter.hpp"
 
 Combfilter::Combfilter(size_t samples,
@@ -48,12 +51,81 @@ Combfilter::~Combfilter() {
   fftw_destroy_plan(plan_backward_);
 }
 
-unsigned int Combfilter::comb_convolute(float** signal,
+float Combfilter::comb_convolute(float** in_signals,
     float accuracy,
     float min_bpm,
     float max_bpm,
     std::vector<unsigned int> bandlimits,
-    unsigned int max_freq) {
+    unsigned int max_freq,
+    unsigned int npulses) {
 
   unsigned int nbands = bandlimits.size();
+
+  //initialisation may better in cstr;
+  fftw_complex** bands_freq_domain = (fftw_complex**)malloc(nbands*sizeof(fftw_complex*));
+  float* filter = (float*)malloc(samples_*sizeof(float));
+  float* filter_freq = (float*)malloc(samples_*sizeof(float));
+
+  for(int i = 0;i<nbands;i++) {
+    bands_freq_domain[i] = fftw_alloc_complex(samples_);
+    for (int j = 0; j < samples_; ++j) {
+      signal_[j][0] = in_signals[i][j];
+      signal_[j][1] = 0;
+    }
+    fftw_execute(plan_forward_);
+    for (int j = 0; j < samples_; ++j) {
+      bands_freq_domain[i][j][0] = result_[j][0];
+      bands_freq_domain[i][j][1] = result_[j][1];
+    }
+  }
+
+  double max_energy = 0.0;
+
+  float bpm = min_bpm;
+  float result_bpm = min_bpm;
+  while(bpm < max_bpm) {
+    
+    float energy = 0;
+    memset(filter,0,samples_*sizeof(float));
+    memset(filter_freq,0,samples_*sizeof(float));
+
+    unsigned int nstep = floor((120/bpm)*max_freq);
+
+    //double percent_done  = (100.0*(bpm-minbpm))/(maxbpm-minbpm);
+    for(int i=0;i<npulses;i++) {
+      filter[i*nstep] = 1.0;
+    }    
+    for (int j = 0; j < samples_; ++j) {
+      signal_[j][0] = filter[j];
+      signal_[j][1] = 0;
+    }
+    fftw_execute(plan_forward_);
+    // calculate energy filter_freq*
+    for (int j = 0; j < samples_; ++j) {
+      filter_freq[j] = (result_[j][0] * result_[j][0])
+                           +(result_[j][1] * result_[j][1]);
+    }
+    // no need for squareroot because for energy it is squared
+    for(int i = 0;i<nbands;i++) {
+      for(int j= 0;j<samples_;j++){
+        float bfd = (bands_freq_domain[i][j][0] *bands_freq_domain[i][j][0])
+                            +(bands_freq_domain[i][j][1] *bands_freq_domain[i][j][1]);
+        energy += filter_freq[j] * bfd;
+      }
+    }
+    if (energy > max_energy)
+    {
+      max_energy = energy;
+      result_bpm = bpm;
+    }
+    bpm += accuracy;
+  }
+
+  free(filter);
+  free(filter_freq);
+  for (int i = 0; i < nbands; ++i)
+  {
+    fftw_free(bands_freq_domain[i]);
+  }
+  free(bands_freq_domain);
 }
