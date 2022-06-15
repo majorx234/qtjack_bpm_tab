@@ -129,3 +129,25 @@ float Combfilter::comb_convolute(float** in_signals,
   }
   free(bands_freq_domain);
 }
+
+float Combfilter::bpm_refinement(float** signal,
+    std::vector<unsigned int> bandlimits,
+    unsigned int max_freq,
+    unsigned int npulses) {
+
+  unsigned int steps = 4;
+  float accuracy[4] = {1.0, 0.5, 0.1, 0.01};
+  float min_bpm_offset[4] = {60.0, 2, 0.5, 0.1};
+  float max_bpm_offset[4] = {60.0, 2, 0.5, 0.1};
+
+  float bpm = 140;
+  for(int i = 0;i<steps;i++){
+    bpm = comb_convolute(signal,
+      accuracy[i],
+      bpm-min_bpm_offset[i],
+      bpm+max_bpm_offset[i],
+      bandlimits,
+      max_freq);
+  }
+  return bpm;
+}

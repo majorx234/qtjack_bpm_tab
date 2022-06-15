@@ -34,6 +34,10 @@ public:
   Combfilter(size_t samples,
              unsigned int sample_rate);
   ~Combfilter();
+  float bpm_refinement(float** signal,
+    std::vector<unsigned int> bandlimits = {0,200,400,800,1600,3200 },
+    unsigned int max_freq = 4096,
+    unsigned int npulses = 3);
 
   float comb_convolute(float** signal,
     float accuracy = 2.0,
