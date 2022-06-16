@@ -110,7 +110,7 @@ void sine_wave( float values[],
 void WaveWidget::testChunk() {
   // <test code>
   float data[1024];
-  sine_wave(data, 1000, 1, 1024, 1014*wave_ofs_, 48000);
+  sine_wave(data, 1000, 1, 1024, 1024*wave_ofs_, 48000);
 
   float limits[4] = {0.0, 0.0, 0.0, 0.0};
 
