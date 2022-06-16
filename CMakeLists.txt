@@ -193,6 +193,18 @@ PRIVATE
   ${FFTW3_LIBRARIES}
 )
 
+add_executable(filterbank_test)
+target_sources(filterbank_test
+  PRIVATE ${FILTERBANK_TEST_SOURCES})
+target_include_directories(filterbank_test
+PRIVATE
+  include
+)
+target_link_libraries(filterbank_test
+PRIVATE
+  filterbank
+)
+
 add_library(envelope_extractor)
 target_sources(envelope_extractor
   PRIVATE  ${ENVELOPE_EXTRACTOR_SOURCES}
