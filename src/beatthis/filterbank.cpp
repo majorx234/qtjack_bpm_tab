@@ -77,6 +77,7 @@ float** Filterbank::filter_signal(float* in_buffer,
 
   // create datastructure for nbands of the output signal
   unsigned int nbands = bandlimits.size();
+
   float** output = (float**)malloc(nbands*sizeof(float*));
   for(int i =0;i<nbands;i++) {
     output[i] = (float*)malloc((samples_)*sizeof(float*));
@@ -89,10 +90,10 @@ float** Filterbank::filter_signal(float* in_buffer,
   // calculate limits of filterbank
   for (int i = 0; i < nbands-1; ++i)
   {
-    bl[i] = floor((bandlimits[i]/max_freq)*(samples_/2));
-    br[i] = floor((bandlimits[i+1]/max_freq)*(samples_/2))-1;
+    bl[i] = floor(((float)bandlimits[i]/(float)max_freq)*(samples_/2));
+    br[i] = floor(((float)bandlimits[i+1]/(float)max_freq)*(samples_/2))-1;
   }
-  bl[nbands-1] = floor((bandlimits[nbands-1]/max_freq)*(samples_/2));
+  bl[nbands-1] = floor(((float)bandlimits[nbands-1]/(float)max_freq)*(samples_/2));
   br[nbands-1] = floor(samples_/2);
 
   for(int i =0;i<nbands;i++) {
