@@ -64,6 +64,8 @@ float** Filterbank::filter_signal(float* in_buffer,
   std::vector<unsigned int> bandlimits,
   unsigned int max_freq) {
 
+  float ifft_factor = 1.0/samples_;
+
   // transform signal in frequency domain
   for(int i = 0;i<samples_;i++) {
     signal_[i][0] = window_[i] * static_cast<double>(in_buffer[i]);
@@ -107,11 +109,15 @@ float** Filterbank::filter_signal(float* in_buffer,
       freqdomain_signal_[j][0] = work_[j][0];
       freqdomain_signal_[j][1] = work_[j][1];
     }
+    // add only freq domain in limits of filterband symetric:
+    for(int j = bl[i];j < br[i];j++) {
+      freqdomain_signal_[samples_-j-1][0] = work_[samples_-j-1][0];
+      freqdomain_signal_[samples_-j-1][1] = work_[samples_-j-1][1];
+    }
     // backtransformation of bands in time domain
     fftw_execute(plan_backward_);
     for(int j = 0;j<samples_;j++) {
-      output[i][j] = sqrt(timedomain_result_[j][0] * timedomain_result_[i][0] +
-                          timedomain_result_[i][1] * timedomain_result_[i][1]);
+      output[i][j] = ifft_factor*timedomain_result_[j][0];
     }
   }
   return output;
