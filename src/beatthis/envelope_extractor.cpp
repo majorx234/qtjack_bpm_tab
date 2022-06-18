@@ -106,10 +106,10 @@ float** EnvelopeExtractor::extract_envelope(float** in_signals,
       freqdomain_signal_[j][0] = result_[j][0] * hann_window_freq_[j][0] - result_[j][1] * hann_window_freq_[j][1];
       freqdomain_signal_[j][1] = result_[j][0] * hann_window_freq_[j][1] + result_[j][1] * hann_window_freq_[j][0];
     }
-    fftw_execute(plan_forward_);
+    fftw_execute(plan_backward_);
     for(int j = 0;j<samples_;j++) {
-      output[i][j] = sqrt(timedomain_result_[j][0] * timedomain_result_[i][0] +
-                          timedomain_result_[i][1] * timedomain_result_[i][1]);
+      output[i][j] = (1.0/ samples_) * sqrt(timedomain_result_[j][0] * timedomain_result_[j][0] +
+                                            timedomain_result_[j][1] * timedomain_result_[j][1]);
     }
   }
   return output;
