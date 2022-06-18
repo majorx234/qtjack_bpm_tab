@@ -54,7 +54,7 @@ void DetectionFunction::initialise( DFConfig Config )
 
     m_magHistory = new float[ m_halfLength ];
     memset(m_magHistory,0, m_halfLength*sizeof(float));
-                
+
     m_phaseHistory = new float[ m_halfLength ];
     memset(m_phaseHistory,0, m_halfLength*sizeof(float));
 
@@ -95,7 +95,7 @@ float DetectionFunction::processTimeDomain(const float *samples)
 {
     m_window->cut(samples, m_windowed);
 
-    m_phaseVoc->processTimeDomain(m_windowed, 
+    m_phaseVoc->processTimeDomain(m_windowed,
                                   m_magnitude, m_thetaAngle, m_unwrapped);
 
     if (m_whiten) whiten();
@@ -104,7 +104,7 @@ float DetectionFunction::processTimeDomain(const float *samples)
 }
 
 float DetectionFunction::processFrequencyDomain(const float *reals,
-                                                 const float *imags)
+                                                const float *imags)
 {
     m_phaseVoc->processFrequencyDomain(reals, imags,
                                        m_magnitude, m_thetaAngle, m_unwrapped);
@@ -136,11 +136,11 @@ float DetectionFunction::runDF()
     case DF_HFC:
         retVal = HFC( m_halfLength, m_magnitude);
         break;
-        
+
     case DF_SPECDIFF:
         retVal = specDiff( m_halfLength, m_magnitude);
         break;
-        
+
     case DF_PHASEDEV:
         // Using the instantaneous phases here actually provides the
         // same results (for these calculations) as if we had used
@@ -148,7 +148,7 @@ float DetectionFunction::runDF()
         // phase error over time
         retVal = phaseDev( m_halfLength, m_thetaAngle);
         break;
-        
+
     case DF_COMPLEXSD:
         retVal = complexSD( m_halfLength, m_magnitude, m_thetaAngle);
         break;
@@ -157,7 +157,7 @@ float DetectionFunction::runDF()
         retVal = broadband( m_halfLength, m_magnitude);
         break;
     }
-        
+
     return retVal;
 }
 
@@ -177,9 +177,9 @@ float DetectionFunction::specDiff(int length, float *src)
     float diff = 0.0;
 
     for (int i = 0; i < length; i++) {
-        
+
         temp = fabs( (src[ i ] * src[ i ]) - (m_magHistory[ i ] * m_magHistory[ i ]) );
-                
+
         diff= sqrt(temp);
 
         // (See note in phaseDev below.)
@@ -212,14 +212,14 @@ float DetectionFunction::phaseDev(int length, float *srcPhase)
         // does significantly damage its ability to work with quieter
         // music, so I'm removing it and counting the result always.
         // Same goes for the spectral difference measure above.
-                
+
         tmpVal  = fabs(dev);
         val += tmpVal ;
 
         m_phaseHistoryOld[ i ] = m_phaseHistory[ i ] ;
         m_phaseHistory[ i ] = srcPhase[ i ];
     }
-        
+
     return val;
 }
 
@@ -230,23 +230,23 @@ float DetectionFunction::complexSD(int length, float *srcMagnitude, float *srcPh
     float tmpPhase = 0;
     float tmpReal = 0;
     float tmpImag = 0;
-   
+
     float dev = 0;
     ComplexData meas = ComplexData( 0, 0 );
     ComplexData j = ComplexData( 0, 1 );
 
     for (int i = 0; i < length; i++) {
-        
+
         tmpPhase = (srcPhase[ i ]- 2*m_phaseHistory[ i ]+m_phaseHistoryOld[ i ]);
         dev= MathUtilities::princarg( tmpPhase );
-                
+
         meas = m_magHistory[i] - ( srcMagnitude[ i ] * exp( j * dev) );
 
         tmpReal = real( meas );
         tmpImag = imag( meas );
 
         val += sqrt( (tmpReal * tmpReal) + (tmpImag * tmpImag) );
-                
+
         m_phaseHistoryOld[ i ] = m_phaseHistory[ i ] ;
         m_phaseHistory[ i ] = srcPhase[ i ];
         m_magHistory[ i ] = srcMagnitude[ i ];
@@ -267,10 +267,9 @@ float DetectionFunction::broadband(int length, float *src)
         m_magHistory[i] = sqrmag;
     }
     return val;
-}        
+}
 
 float* DetectionFunction::getSpectrumMagnitude()
 {
     return m_magnitude;
 }
-
