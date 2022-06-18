@@ -65,8 +65,8 @@ int main(int argc, char const *argv[])
   sine_wave(data2, freq2, 1, samples, 0, sample_rate);
   sine_wave(data3, freq3, 1, samples, 0, sample_rate);
   sine_wave(data4, freq4, 1, samples, 0, sample_rate);
-  sine_wave(data4, freq5, 1, samples, 0, sample_rate);
-  sine_wave(data4, freq6, 1, samples, 0, sample_rate);
+  sine_wave(data5, freq5, 1, samples, 0, sample_rate);
+  sine_wave(data6, freq6, 1, samples, 0, sample_rate);
 
   float* data_array[6] = {data1,data2,data3,data4,data5,data6};
   for(int i = 0;i<6;i++){
@@ -92,6 +92,7 @@ int main(int argc, char const *argv[])
       printf("%f\n",result[i][j]);
     }
   }
+
   for(int i = 0;i<6;i++){
     free(result[i]);
   }
