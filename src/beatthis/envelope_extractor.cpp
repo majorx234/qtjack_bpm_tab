@@ -40,7 +40,6 @@ EnvelopeExtractor::EnvelopeExtractor(size_t samples,
                                    FFTW_FORWARD, FFTW_ESTIMATE);
   plan_backward_ = fftw_plan_dft_1d(samples, freqdomain_signal_, timedomain_result_,
                                     FFTW_BACKWARD, FFTW_ESTIMATE);
-
 }
 
 EnvelopeExtractor::~EnvelopeExtractor(){
@@ -69,9 +68,8 @@ void EnvelopeExtractor::calculate_halfhann_window_fct(
   // only part at start is set to half hann
   for (int i = 0; i < hann_length; ++i)
   {
-    signal_[i][0] = 0.5-0.5*cos((M_PI * i) / hann_length);
+    signal_[i][0] = 0.5+0.5*cos((M_PI * i) / hann_length);
   }
-
   // calculate freq domain of half hann window
   fftw_execute(plan_forward_);
   for(int i = 0;i<samples_;i++) {
