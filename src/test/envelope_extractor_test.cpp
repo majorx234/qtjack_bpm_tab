@@ -1,7 +1,7 @@
 #include <cmath>
 #include <cstring>
 #include <cassert>
-#include "beatthis/filterbank.hpp"
+#include "beatthis/envelope_extractor.hpp"
 
 // just for test reasons, will be replaced in future
 void sine_wave( float values[],
@@ -40,18 +40,61 @@ void exponential_decay( float values[],
 
 int main(int argc, char const *argv[])
 {
-  float decay_values[48000];
-  unsigned int samples = 48000;
+  float decay_values[96000];
+  unsigned int samples = 96000;
   unsigned int sample_rate = 48000;
   unsigned int offset = 8000;
-  unsigned int length_ms = 200;
-  exponential_decay(decay_values,
-    samples,
-    offset,
-    sample_rate,
-    length_ms);
-  for (int i = 0; i < samples; i++) {
-    printf("%g\n",decay_values[i]);
+
+  float data1[samples];
+  float data2[samples];
+  float data3[samples];
+  float data4[samples];
+  float data5[samples];
+  float data6[samples];
+  float sum[samples];
+
+  int freq1 = 100;
+  int freq2 = 300;
+  int freq3 = 500;
+  int freq4 = 1100;
+  int freq5 = 1700;
+  int freq6 = 2900;
+  unsigned int length_ms[6] = {690,470,290,170,110,50};
+
+  sine_wave(data1, freq1, 1, samples, 0, sample_rate);
+  sine_wave(data2, freq2, 1, samples, 0, sample_rate);
+  sine_wave(data3, freq3, 1, samples, 0, sample_rate);
+  sine_wave(data4, freq4, 1, samples, 0, sample_rate);
+  sine_wave(data4, freq5, 1, samples, 0, sample_rate);
+  sine_wave(data4, freq6, 1, samples, 0, sample_rate);
+
+  float* data_array[6] = {data1,data2,data3,data4,data5,data6};
+  for(int i = 0;i<6;i++){
+    exponential_decay(decay_values,
+      samples,
+      offset,
+      sample_rate,
+      length_ms[i]);
+    for(int j=0;j<samples;j++){
+      data_array[i][j] = data_array[i][j] * decay_values[j];
+    }
   }
+
+  EnvelopeExtractor envelope_extractor(samples,sample_rate);
+
+  float** result = envelope_extractor.extract_envelope(data_array,
+    {0,200,400,800,1600,3200},
+    4096,
+    0.4);
+
+  for(int i = 0;i<6;i++){
+    for(int j=0;j<samples;j++){
+      printf("%f\n",result[i][j]);
+    }
+  }
+  for(int i = 0;i<6;i++){
+    free(result[i]);
+  }
+  free(result);
   return 0;
 }
