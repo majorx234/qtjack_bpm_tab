@@ -6,7 +6,7 @@ void sine_wave( float values[],
                 int freq,
                 int freq_amp,
                 int num_samples,
-                int  offset,
+                int offset,
                 int sample_rate) {
   //int num_samples  = static_cast<int>(duration * sample_rate);
   for (int i =  offset; i < num_samples + offset; i++) {
@@ -36,14 +36,11 @@ int main(int argc, char *argv[]) {
   sine_wave(data4, freq4, 1, samples, 0, 48000);
   
   for (int i = 0; i < samples; i++) {
-    sum[i] = data1[i] + data2[i] + data3[i] + data4[i];   
+    sum[i] = 0.25*(data1[i] + data2[i] + data3[i] + data4[i]);
   }
 
-  Filterbank filterbank(samples,sample_rate);
-  float** result = filterbank.filter_signal(sum);
-  for (int i = 0; i < samples; i++) {
-    printf("%g\n",sum[i]);
-  }
+  Filterbank filterbank(samples, sample_rate);
+  float** result = filterbank.filter_signal(sum,{0,200,400,800,1600,3200 },4096);
 
   for (int i = 0; i < samples; i++) {
     printf("%g\n",result[0][i]);
