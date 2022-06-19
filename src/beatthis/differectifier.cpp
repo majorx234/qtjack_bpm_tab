@@ -44,7 +44,7 @@ float** differectifier(float** in_signals,
   // calculate difference frome one sample to next for all bands
   for(int i =0;i<nbands;i++) {
     for(int j = 0;j<(samples-1);j++) {
-      float difference = in_signals[i+1][j] - in_signals[i][j];
+      float difference = in_signals[i][j+1] - in_signals[i][j];
       output[i][j] = 0;
 
       // take only positive values -> half wave rectify)
