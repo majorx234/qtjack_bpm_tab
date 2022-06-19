@@ -58,7 +58,6 @@ float Combfilter::comb_convolute(float** in_signals,
     std::vector<unsigned int> bandlimits,
     unsigned int max_freq,
     unsigned int npulses) {
-
   unsigned int nbands = bandlimits.size();
 
   //initialisation may better in cstr;
@@ -92,6 +91,8 @@ float Combfilter::comb_convolute(float** in_signals,
     unsigned int nstep = floor((120/bpm)*max_freq);
 
     //double percent_done  = (100.0*(bpm-minbpm))/(maxbpm-minbpm);
+
+    // npluses = #peaks in filter
     for(int i=0;i<npulses;i++) {
       filter[i*nstep] = 1.0;
     }    
@@ -128,6 +129,7 @@ float Combfilter::comb_convolute(float** in_signals,
     fftw_free(bands_freq_domain[i]);
   }
   free(bands_freq_domain);
+  return result_bpm;
 }
 
 float Combfilter::bpm_refinement(float** signal,
@@ -147,7 +149,8 @@ float Combfilter::bpm_refinement(float** signal,
       bpm-min_bpm_offset[i],
       bpm+max_bpm_offset[i],
       bandlimits,
-      max_freq);
+      max_freq,
+      npulses);
   }
   return bpm;
 }
