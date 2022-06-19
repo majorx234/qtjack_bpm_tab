@@ -150,7 +150,7 @@ target_link_libraries(analyzerqueenmarybeats
   buffering_utils
   detection_function
 )
-####### Beattetection BeatThis #######
+####### Beatdetection BeatThis #######
 set(FILTERBANK_SOURCES
   src/beatthis/filterbank.cpp)
 
@@ -174,6 +174,9 @@ set(DIFFERECTIFIER_SOURCES
 
 set(DIFFERECTIFIER_HEADERS
   include/beatthis/differectifier.hpp)
+
+set(DIFFERECTIFIER_TEST_SOURCES
+  src/test/differectifier_test.cpp)
 
 set(COMBFILTER_SOURCES
   src/beatthis/combfilter.cpp)
@@ -244,6 +247,20 @@ target_include_directories(differectifier
 PRIVATE 
   include
   ${FFTW3_INCLUDE_DIRS}
+)
+
+add_executable(differectifier_test)
+target_sources(differectifier_test
+  PRIVATE  ${DIFFERECTIFIER_TEST_SOURCES}
+)
+target_include_directories(differectifier_test
+PRIVATE
+  include
+)
+target_link_libraries(differectifier_test
+PRIVATE
+  envelope_extractor
+  differectifier
 )
 
 add_library(combfilter)
