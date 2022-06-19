@@ -184,6 +184,9 @@ set(COMBFILTER_SOURCES
 set(COMBFILTER_HEADERS
   include/beatthis/combfilter.hpp)
 
+set(COMBFILTER_TEST_SOURCES
+  src/test/combfilter_test.cpp)
+
 add_library(filterbank)
 target_sources(filterbank
   PRIVATE  ${FILTERBANK_SOURCES}
@@ -277,6 +280,22 @@ target_link_libraries(combfilter
 PRIVATE
   ${FFTW3_LIBRARIES}
 )
+
+add_executable(combfilter_test)
+target_sources(combfilter_test
+  PRIVATE  ${COMBFILTER_TEST_SOURCES}
+)
+target_include_directories(combfilter_test
+PRIVATE
+  include
+)
+target_link_libraries(combfilter_test
+PRIVATE
+  envelope_extractor
+  differectifier
+  combfilter
+)
+
 ####### BPM Tab #######
 set(AVRG_QUEUE_SOURCES
   src/avrg_queue.cpp
