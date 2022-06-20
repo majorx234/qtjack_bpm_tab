@@ -187,6 +187,9 @@ set(COMBFILTER_HEADERS
 set(COMBFILTER_TEST_SOURCES
   src/test/combfilter_test.cpp)
 
+set(BEATTHIS_TEST_SOURCES
+  src/test/beatthis_test.cpp)
+
 add_library(filterbank)
 target_sources(filterbank
   PRIVATE  ${FILTERBANK_SOURCES}
@@ -291,6 +294,22 @@ PRIVATE
 )
 target_link_libraries(combfilter_test
 PRIVATE
+  envelope_extractor
+  differectifier
+  combfilter
+)
+
+add_executable(beatthis_test)
+target_sources(beatthis_test
+  PRIVATE ${BEATTHIS_TEST_SOURCES} 
+)
+target_include_directories(beatthis_test
+PRIVATE
+  include
+)
+target_link_libraries(beatthis_test
+PRIVATE
+  filterbank
   envelope_extractor
   differectifier
   combfilter
