@@ -2,6 +2,8 @@
 #include <cstring>
 #include <cassert>
 #include <random>
+#include <iostream>
+#include <chrono>
 #include "beatthis/filterbank.hpp"
 #include "beatthis/envelope_extractor.hpp"
 #include "beatthis/differectifier.hpp"
@@ -76,6 +78,7 @@ int main(int argc, char const *argv[])
   int freq7 = 200;
   unsigned int length_ms[8] = {690,470,290,170,110,50,550,30};
 
+  std::chrono::steady_clock::time_point time1_start_wave_creation = std::chrono::steady_clock::now();
   sine_wave(data1, freq1, 10, samples, 0, sample_rate);
   sine_wave(data2, freq2, 30, samples, 0, sample_rate);
   sine_wave(data3, freq3, 50, samples, 0, sample_rate);
@@ -93,6 +96,8 @@ int main(int argc, char const *argv[])
   for(int i = 0;i<samples;i++) {
     data8[i] = (float)distr(generator)/1000.0;
   }
+
+  std::chrono::steady_clock::time_point time2_start_enveolope_and_sum_wave = std::chrono::steady_clock::now();
 
   float* data_array[8] = {data1,data2,data3,data4,data5,data6,data7,data8};
   for(int i = 0;i<8;i++){
@@ -113,10 +118,11 @@ int main(int argc, char const *argv[])
     }
   }
 
+  std::chrono::steady_clock::time_point time3_start_filterbank = std::chrono::steady_clock::now();
   Filterbank filterbank(samples, sample_rate);
   float** filter_result = filterbank.filter_signal(sum,{0,200,400,800,1600,3200 },4096);
 
-
+  std::chrono::steady_clock::time_point time4_start_envelope_extractor = std::chrono::steady_clock::now();
   EnvelopeExtractor envelope_extractor(samples,sample_rate);
 
   float** result = envelope_extractor.extract_envelope(filter_result,
@@ -124,11 +130,13 @@ int main(int argc, char const *argv[])
     4096,
     0.4);
 
+  std::chrono::steady_clock::time_point time5_differectifier = std::chrono::steady_clock::now();
   differectifier(result,
                  samples,
                  6,
                  true);
 
+  std::chrono::steady_clock::time_point time6_start_combfilter = std::chrono::steady_clock::now();
   Combfilter comb_filter(samples,sample_rate);
 
   float bpm = comb_filter.bpm_refinement(result,
@@ -141,6 +149,8 @@ int main(int argc, char const *argv[])
       printf("%f\n",result[i][j]);
     }
   }*/
+  std::chrono::steady_clock::time_point time7_free = std::chrono::steady_clock::now();
+
   printf("bpm = %f \n",bpm);
 
   for (int i = 0;i<6;i++) {
@@ -151,5 +161,30 @@ int main(int argc, char const *argv[])
     free(result[i]);
   }
   free(result);
+  std::chrono::steady_clock::time_point time8_finish = std::chrono::steady_clock::now();
+
+  std::string time_points_str[8] = {
+    "time1_start_wave_creation",
+    "time2_start_enveolope_and_sum_wave",
+    "time3_start_filterbank",
+    "time4_start_envelope_extractor",
+    "time5_differectifier",
+    "time6_start_combfilter",
+    "time7_free",
+    "time8_finish"
+    };
+  std::chrono::steady_clock::time_point time_points[8] = {  
+    time1_start_wave_creation,
+    time2_start_enveolope_and_sum_wave,
+    time3_start_filterbank,
+    time4_start_envelope_extractor,
+    time5_differectifier,
+    time6_start_combfilter,
+    time7_free,
+    time8_finish
+  };
+  for(int i = 0;i<7;i++) {
+    std::cout << "Time difference = " << time_points_str[i] << " " << std::chrono::duration_cast<std::chrono::microseconds>(time_points[i+1] - time_points[i]).count() <<std::endl;
+  }
   return 0;
 }
