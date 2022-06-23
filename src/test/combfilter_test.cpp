@@ -91,11 +91,15 @@ int main(int argc, char const *argv[])
     }
   }
 
+  std::vector<unsigned int> bandlimits = {0,200,400,800,1600,3200};
+  unsigned int max_freq = 4096;
+  unsigned int nbands = bandlimits.size();
+
   EnvelopeExtractor envelope_extractor(samples,sample_rate);
 
   float** result = envelope_extractor.extract_envelope(data_array,
-    {0,200,400,800,1600,3200},
-    4096,
+    bandlimits,
+    max_freq,
     0.4);
 
   differectifier(result,
@@ -103,11 +107,11 @@ int main(int argc, char const *argv[])
                  6,
                  true);
 
-  Combfilter comb_filter(samples,sample_rate);
+  Combfilter comb_filter(samples, sample_rate, nbands);
 
   float bpm = comb_filter.bpm_refinement(result,
-    {0,200,400,800,1600,3200},
-    4096,
+    bandlimits,
+    max_freq,
     3);
 /*
   for(int i = 0;i<6;i++){

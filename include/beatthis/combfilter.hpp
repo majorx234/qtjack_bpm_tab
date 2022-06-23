@@ -32,7 +32,8 @@ class Combfilter
 {
 public:
   Combfilter(size_t samples,
-             unsigned int sample_rate);
+             unsigned int sample_rate,
+             unsigned int nbands);
   ~Combfilter();
   float bpm_refinement(float** signal,
     std::vector<unsigned int> bandlimits = {0,200,400,800,1600,3200 },
@@ -46,13 +47,17 @@ public:
     std::vector<unsigned int> bandlimits = {0,200,400,800,1600,3200 },
     unsigned int max_freq = 4096,
     unsigned int npulses = 3);
-private:  
+private:
   size_t samples_;
   unsigned int sample_rate_;
+  unsigned int nbands_;
   fftw_complex* signal_;
   fftw_complex* result_;
   fftw_complex* freqdomain_signal_;
   fftw_complex* timedomain_result_;
   fftw_plan plan_forward_;
-  fftw_plan plan_backward_;	
+  fftw_plan plan_backward_;
+  fftw_complex** bands_freq_domain_;
+  float* filter_;
+  float* filter_freq_;
 };

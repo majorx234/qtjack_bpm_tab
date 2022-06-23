@@ -118,16 +118,20 @@ int main(int argc, char const *argv[])
     }
   }
 
+  std::vector<unsigned int> bandlimits = {0,200,400,800,1600,3200};
+  unsigned int max_freq = 4096;
+  unsigned int nbands = bandlimits.size();
+
   std::chrono::steady_clock::time_point time3_start_filterbank = std::chrono::steady_clock::now();
   Filterbank filterbank(samples, sample_rate);
-  float** filter_result = filterbank.filter_signal(sum,{0,200,400,800,1600,3200 },4096);
+  float** filter_result = filterbank.filter_signal(sum,bandlimits,max_freq);
 
   std::chrono::steady_clock::time_point time4_start_envelope_extractor = std::chrono::steady_clock::now();
   EnvelopeExtractor envelope_extractor(samples,sample_rate);
 
   float** result = envelope_extractor.extract_envelope(filter_result,
-    {0,200,400,800,1600,3200},
-    4096,
+    bandlimits,
+    max_freq,
     0.4);
 
   std::chrono::steady_clock::time_point time5_differectifier = std::chrono::steady_clock::now();
@@ -137,11 +141,12 @@ int main(int argc, char const *argv[])
                  true);
 
   std::chrono::steady_clock::time_point time6_start_combfilter = std::chrono::steady_clock::now();
-  Combfilter comb_filter(samples,sample_rate);
+
+  Combfilter comb_filter(samples, sample_rate, nbands);
 
   float bpm = comb_filter.bpm_refinement(result,
-    {0,200,400,800,1600,3200},
-    4096,
+    bandlimits,
+    max_freq,
     3);
 /*
   for(int i = 0;i<6;i++){

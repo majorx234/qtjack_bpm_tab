@@ -27,19 +27,29 @@
 #include "beatthis/combfilter.hpp"
 
 Combfilter::Combfilter(size_t samples,
-                   unsigned int sample_rate)
+                   unsigned int sample_rate,
+                   unsigned int nbands)
   : samples_(samples)
-  ,sample_rate_(sample_rate)
+  , sample_rate_(sample_rate)
+  , nbands_(nbands)
+  , bands_freq_domain_(nullptr)
+  , filter_(nullptr)
+  , filter_freq_(nullptr)
 {
   signal_ = fftw_alloc_complex(samples);
   result_ = fftw_alloc_complex(samples);
   freqdomain_signal_ = fftw_alloc_complex(samples);
   timedomain_result_ = fftw_alloc_complex(samples);
-  plan_forward_ = fftw_plan_dft_1d(samples, signal_, result_, 
+  plan_forward_ = fftw_plan_dft_1d(samples, signal_, result_,
                                    FFTW_FORWARD, FFTW_ESTIMATE);
   plan_backward_ = fftw_plan_dft_1d(samples, freqdomain_signal_, timedomain_result_,
                                     FFTW_BACKWARD, FFTW_ESTIMATE);
-
+  bands_freq_domain_ = (fftw_complex**)malloc(nbands_*sizeof(fftw_complex*));
+  for(int i = 0;i<nbands_;i++) {
+    bands_freq_domain_[i] = fftw_alloc_complex(samples_);
+  }
+  filter_ = (float*)malloc(samples_*sizeof(float));
+  filter_freq_ = (float*)malloc(samples_*sizeof(float));
 }
 
 Combfilter::~Combfilter() {
@@ -49,6 +59,17 @@ Combfilter::~Combfilter() {
   fftw_free(timedomain_result_);
   fftw_destroy_plan(plan_forward_);
   fftw_destroy_plan(plan_backward_);
+  if(bands_freq_domain_) {
+    for (int i = 0; i < nbands_; ++i)
+    {
+      fftw_free(bands_freq_domain_[i]);
+    }
+    free(bands_freq_domain_);
+  }
+  if(filter_)
+    free(filter_);
+  if(filter_freq_)
+    free(filter_freq_);
 }
 
 float Combfilter::comb_convolute(float** in_signals,
@@ -58,23 +79,18 @@ float Combfilter::comb_convolute(float** in_signals,
     std::vector<unsigned int> bandlimits,
     unsigned int max_freq,
     unsigned int npulses) {
-  unsigned int nbands = bandlimits.size();
 
   //initialisation may better in cstr;
-  fftw_complex** bands_freq_domain = (fftw_complex**)malloc(nbands*sizeof(fftw_complex*));
-  float* filter = (float*)malloc(samples_*sizeof(float));
-  float* filter_freq = (float*)malloc(samples_*sizeof(float));
 
-  for(int i = 0;i<nbands;i++) {
-    bands_freq_domain[i] = fftw_alloc_complex(samples_);
+  for(int i = 0;i<nbands_;i++) {
     for (int j = 0; j < samples_; ++j) {
       signal_[j][0] = in_signals[i][j];
       signal_[j][1] = 0;
     }
     fftw_execute(plan_forward_);
     for (int j = 0; j < samples_; ++j) {
-      bands_freq_domain[i][j][0] = result_[j][0];
-      bands_freq_domain[i][j][1] = result_[j][1];
+      bands_freq_domain_[i][j][0] = result_[j][0];
+      bands_freq_domain_[i][j][1] = result_[j][1];
     }
   }
 
@@ -83,10 +99,10 @@ float Combfilter::comb_convolute(float** in_signals,
   float bpm = min_bpm;
   float result_bpm = min_bpm;
   while(bpm < max_bpm) {
-    
+
     float energy = 0;
-    memset(filter,0,samples_*sizeof(float));
-    memset(filter_freq,0,samples_*sizeof(float));
+    memset(filter_,0,samples_*sizeof(float));
+    memset(filter_freq_,0,samples_*sizeof(float));
 
     unsigned int nstep = floor((120/bpm)*max_freq);
 
@@ -94,24 +110,24 @@ float Combfilter::comb_convolute(float** in_signals,
 
     // npluses = #peaks in filter
     for(int i=0;i<npulses;i++) {
-      filter[i*nstep] = 1.0;
-    }    
+      filter_[i*nstep] = 1.0;
+    }
     for (int j = 0; j < samples_; ++j) {
-      signal_[j][0] = filter[j];
+      signal_[j][0] = filter_[j];
       signal_[j][1] = 0;
     }
     fftw_execute(plan_forward_);
-    // calculate energy filter_freq*
+    // calculate energy filter_freq_*
     for (int j = 0; j < samples_; ++j) {
-      filter_freq[j] = (result_[j][0] * result_[j][0])
+      filter_freq_[j] = (result_[j][0] * result_[j][0])
                            +(result_[j][1] * result_[j][1]);
     }
     // no need for squareroot because for energy it is squared
-    for(int i = 0;i<nbands;i++) {
+    for(int i = 0;i<nbands_;i++) {
       for(int j= 0;j<samples_;j++){
-        float bfd = (bands_freq_domain[i][j][0] *bands_freq_domain[i][j][0])
-                            +(bands_freq_domain[i][j][1] *bands_freq_domain[i][j][1]);
-        energy += filter_freq[j] * bfd;
+        float bfd = (bands_freq_domain_[i][j][0] *bands_freq_domain_[i][j][0])
+                            +(bands_freq_domain_[i][j][1] *bands_freq_domain_[i][j][1]);
+        energy += filter_freq_[j] * bfd;
       }
     }
     if (energy > max_energy)
@@ -122,13 +138,6 @@ float Combfilter::comb_convolute(float** in_signals,
     bpm += accuracy;
   }
 
-  free(filter);
-  free(filter_freq);
-  for (int i = 0; i < nbands; ++i)
-  {
-    fftw_free(bands_freq_domain[i]);
-  }
-  free(bands_freq_domain);
   return result_bpm;
 }
 
