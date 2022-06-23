@@ -190,6 +190,9 @@ set(COMBFILTER_TEST_SOURCES
 set(BEATTHIS_TEST_SOURCES
   src/test/beatthis_test.cpp)
 
+set(BEATTHIS_MEMORY_TEST_SOURCES
+    src/test/beatthis_memory_test.cpp)
+
 add_library(filterbank)
 target_sources(filterbank
   PRIVATE  ${FILTERBANK_SOURCES}
@@ -222,7 +225,7 @@ target_sources(envelope_extractor
   PRIVATE  ${ENVELOPE_EXTRACTOR_SOURCES}
   PUBLIC ${ENVELOPE_EXTRACTOR_HEADERS}
 )
-target_include_directories(envelope_extractor 
+target_include_directories(envelope_extractor
 PRIVATE 
   include
   ${FFTW3_INCLUDE_DIRS}
@@ -249,7 +252,7 @@ target_sources(differectifier
   PRIVATE  ${DIFFERECTIFIER_SOURCES}
   PUBLIC ${DIFFERECTIFIER_HEADERS}
 )
-target_include_directories(differectifier 
+target_include_directories(differectifier
 PRIVATE 
   include
   ${FFTW3_INCLUDE_DIRS}
@@ -274,7 +277,7 @@ target_sources(combfilter
   PRIVATE  ${COMBFILTER_SOURCES}
   PUBLIC ${COMBFILTER_HEADERS}
 )
-target_include_directories(combfilter 
+target_include_directories(combfilter
 PRIVATE 
   include
   ${FFTW3_INCLUDE_DIRS}
@@ -301,13 +304,29 @@ PRIVATE
 
 add_executable(beatthis_test)
 target_sources(beatthis_test
-  PRIVATE ${BEATTHIS_TEST_SOURCES} 
+  PRIVATE ${BEATTHIS_TEST_SOURCES}
 )
 target_include_directories(beatthis_test
 PRIVATE
   include
 )
 target_link_libraries(beatthis_test
+PRIVATE
+  filterbank
+  envelope_extractor
+  differectifier
+  combfilter
+)
+
+add_executable(beatthis_memory_test)
+target_sources(beatthis_memory_test
+  PRIVATE ${BEATTHIS_MEMORY_TEST_SOURCES}
+)
+target_include_directories(beatthis_memory_test
+PRIVATE
+  include
+)
+target_link_libraries(beatthis_memory_test
 PRIVATE
   filterbank
   envelope_extractor
