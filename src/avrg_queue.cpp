@@ -36,7 +36,7 @@ double AvrgQueue::get_avrg() {
   if (!empty()) {
     double sum = 0;
     double average_value = values.front();
-    for (size_t i = 1; i <= values.size(); ++i) {
+    for (std::size_t i = 1; i <= values.size(); ++i) {
       double elem = std::move(values.front());
       values.pop();
       sum += elem;
