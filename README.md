@@ -47,10 +47,11 @@ make
 - uses parts of analyzerplugin concept of Mixxx: (https://github.com/mixxxdj/mixxx.git)
 - uses parts of qm-vamp-plugins: (queenmarybeatdetection & TempoTrackV2) (https://github.com/c4dm/qm-vamp-plugins)
 - uses Kissfft: (https://github.com/mborgerding/kissfft)
-- uses Idea for visualization of wave by Matthias Nagorni (https://www.heise.de/hintergrund/Parallelprogrammierung-mit-C-und-Qt-Teil-3-Plattformunabhaengige-Audioprogrammierung-1576739.html)
-  
+- uses idea for visualization of wave by Matthias Nagorni (https://www.heise.de/hintergrund/Parallelprogrammierung-mit-C-und-Qt-Teil-3-Plattformunabhaengige-Audioprogrammierung-1576739.html)
+- used idea behind beat this BPM detection (https://www.clear.rice.edu/elec301/Projects01/beat_sync/beatalgo.html)  
 
 ## History
+- 2022-06-23 Implement library for Beat This BPM detection algo and test functions
 - 2022-05-26 Add Super Circular Buffer structure to have circular buffer with continously data
 - 2022-05-23 Modify QM bpm detection for use in bpm_tab widget
 - 2022-05-21 Add Visualization fo Jack Input
