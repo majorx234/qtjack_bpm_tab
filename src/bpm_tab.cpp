@@ -282,5 +282,8 @@ void BpmTab::tab() {
 }
 
 void BpmTab::calc_bpm(){
-  printf("calc_bpm() triggered, chunk_counter_: %d\n",chunk_counter_);
+  static unsigned int old_chunk_counter = 0;
+  unsigned int div_chunk_counter = chunk_counter_ - old_chunk_counter;
+  printf("calc_bpm() triggered,\n  chunk_counter_: %d\n  chunk_size: %d\n", chunk_counter_,  div_chunk_counter);
+  old_chunk_counter = chunk_counter_;
 }
