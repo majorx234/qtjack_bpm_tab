@@ -64,7 +64,9 @@ class AnalyzerBeatsPlugin : public AnalyzerPlugin {
   ~AnalyzerBeatsPlugin() override = default;
 
   virtual bool supportsBeatTracking() const = 0;
-  virtual double getBpm() const {}
+  virtual double getBpm() const {
+    return 0.0;
+  }
   virtual std::vector<unsigned int> getBeats() const {
     return {};
   }
