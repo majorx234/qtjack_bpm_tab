@@ -103,7 +103,6 @@ class BpmTab : public QWidget, public QtJack::Processor {
   std::atomic_int alive;
   std::condition_variable audio_chunk_cv;
   std::mutex audio_mutex;
-  AnalyzerBeatsPlugin* _qm_beat_detection;
   SuperCircularBuffer<float> super_circular_buffer[2];
 };
 

@@ -27,7 +27,6 @@
 #include <QString>
 #include <MidiMsg>
 #include "bpm_tab.hpp"
-#include "bpmdetection/analyzerqueenmarybeats.hpp"
 
 BpmTab::BpmTab(QWidget *parent)
   : QWidget(parent)
@@ -52,8 +51,6 @@ BpmTab::BpmTab(QWidget *parent)
   waveHbox->addWidget(wave_widget);
   bpm_tab_ui->waveBox->setLayout(waveHbox);
   setupJackClient();
-  _qm_beat_detection = new AnalyzerQueenMaryBeats();
-  _qm_beat_detection->initialize(_sample_rate);
   connect(this, &BpmTab::on_set_bpm,
           this->bpm_tab_ui->bpmLabel, &QLabel::setText);
   connect(this->bpm_tab_ui->tabButton, &QPushButton::clicked,
