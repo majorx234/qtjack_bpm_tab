@@ -43,7 +43,6 @@ BpmTab::BpmTab(QWidget *parent)
   , alive(true)
   , _audio_buffer_size(48000*30) // default, but will reset in setupJackClient
   , _new_samples_in_audio_buffer(0)
-  , super_circular_buffer{SuperCircularBuffer<float>(300,1024),SuperCircularBuffer<float>(300,1024)}    
 {
   bpm_tab_ui->setupUi(this);
   wave_widget = new WaveWidget(parent);
@@ -236,8 +235,6 @@ void BpmTab::audio_process_fct() {
       limits[3] = 0;
     }
   }
-  super_circular_buffer[0].add_chunk(_audio_buffer[0]);
-  super_circular_buffer[1].add_chunk(_audio_buffer[1]);
   if(chunk_counter_ > 300 && (chunk_counter_ % 46 == 0)) {
     emit on_buffer_ready_to_calc_bpm();
   }

@@ -174,9 +174,3 @@ target_link_libraries(bpm_tab_main
   qtjack::qtjack
   bpm_tab
 )
-
-add_executable(super_cicular_buffer_test)
-target_sources(super_cicular_buffer_test
-  PRIVATE src/test/super_circular_buffer_test.cpp
-)
-target_include_directories(super_cicular_buffer_test PRIVATE include)
