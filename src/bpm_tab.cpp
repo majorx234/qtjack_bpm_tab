@@ -62,7 +62,7 @@ BpmTab::BpmTab(QWidget *parent)
           this, &BpmTab::calc_bpm);
 
   //thread to generate periodic midimsgs
-  cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send,this);
+  cyclic_midi_msgs_sender = std::thread(&BpmTab::midi_message_send_thread_fct,this);
   startTimer(50);
 }
 
