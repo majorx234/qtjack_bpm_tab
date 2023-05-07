@@ -72,19 +72,27 @@ void WaveWidget::paintEvent(QPaintEvent *event) {
   p.drawLine(0, (int)(0.5 * (double)l), w - 1, (int)(0.5 * (double)l));
   p.drawLine(0, (int)(1.5 * (double)l), w - 1, (int)(1.5 * (double)l));
   for (int i = 0; i < w; i++) {
+    double ch0_upper = 0.5 * (double)l - yScale * wave_[0][(wave_ofs_ + i) % w];
+    double ch0_lower = 0.5 * (double)l - yScale * wave_[1][(wave_ofs_ + i) % w];
+    double ch1_upper = 1.5 * (double)l - yScale * wave_[2][(wave_ofs_ + i) % w];
+    double ch1_lower = 1.5 * (double)l - yScale * wave_[3][(wave_ofs_ + i) % w];
     if(beats_[(wave_ofs_ + i) % w]) {
-      p.setPen(QPen(QBrush(QColor(255, 0, 255)), 1));
+      ch0_upper = 0.5 * (double)l - yScale*(-1.0);
+      ch0_lower = 0.5 * (double)l - yScale*(1.0);
+      ch1_upper = 1.5 * (double)l - yScale*(-1.0);
+      ch1_lower = 1.5 * (double)l - yScale*(1.0);
+      p.setPen(QPen(QBrush(QColor(0, 233, 0)), 1));
     } else {
       p.setPen(QPen(QBrush(QColor(170, 120, 0)), 1));
     }
     p.drawLine(i,
-               (int)(0.5 * (double)l - yScale * wave_[0][(wave_ofs_ + i) % w]),
+               (int)(ch0_upper),
                i,
-               (int)(0.5 * (double)l - yScale * wave_[1][(wave_ofs_ + i) % w]));
+               (int)(ch0_lower));
     p.drawLine(i,
-               (int)(1.5 * (double)l - yScale * wave_[2][(wave_ofs_ + i) % w]),
+               (int)(ch1_upper),
                i,
-               (int)(1.5 * (double)l - yScale * wave_[3][(wave_ofs_ + i) % w]));
+               (int)(ch1_lower));
   }
   p.end();
 }
