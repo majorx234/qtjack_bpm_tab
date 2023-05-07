@@ -30,12 +30,15 @@
 #include <math.h>
 #define _USE_MATH_DEFINES
 
-WaveWidget::WaveWidget(QWidget *parent) {
+WaveWidget::WaveWidget(QWidget *parent)
+  : beat_received(false) {
   setMinimumSize(400,100);
   setPalette(QPalette(QColor(200, 200, 200), QColor(20, 0, 70)));
   setAutoFillBackground(true);
-  for (int i = 0; i < 4; i++) {
 
+  beats_ = (bool *)malloc(width() * sizeof(bool));
+  memset(beats_, false, width() * sizeof(bool));
+  for (int i = 0; i < 4; i++) {
     wave_[i] = (double *)malloc(width() * sizeof(double));
     memset(wave_[i], 0, width() * sizeof(double));
   }
@@ -45,6 +48,7 @@ WaveWidget::WaveWidget(QWidget *parent) {
 }
 
 WaveWidget::~WaveWidget() {
+  delete beats_;
   for (int i = 0; i < 4; i++)
     delete wave_[i];
 
@@ -58,11 +62,21 @@ void WaveWidget::paintEvent(QPaintEvent *event) {
   double yScale = h / 4.0;
   int l = h >> 1;
   p.begin(this);
-  p.setPen(QPen(QBrush(QColor(170, 120, 0)), 1));
+  if(beat_received) {
+    beat_received = false;
+    beats_[wave_ofs_] = true;
+  } else {
+    beats_[wave_ofs_] = false;
+  }
+
   p.drawLine(0, (int)(0.5 * (double)l), w - 1, (int)(0.5 * (double)l));
   p.drawLine(0, (int)(1.5 * (double)l), w - 1, (int)(1.5 * (double)l));
   for (int i = 0; i < w; i++) {
-
+    if(beats_[(wave_ofs_ + i) % w]) {
+      p.setPen(QPen(QBrush(QColor(255, 0, 255)), 1));
+    } else {
+      p.setPen(QPen(QBrush(QColor(170, 120, 0)), 1));
+    }
     p.drawLine(i,
                (int)(0.5 * (double)l - yScale * wave_[0][(wave_ofs_ + i) % w]),
                i,
@@ -77,6 +91,10 @@ void WaveWidget::paintEvent(QPaintEvent *event) {
 
 void WaveWidget::resizeEvent(QResizeEvent *ev) {
 
+}
+
+void WaveWidget::setBeat() {
+  beat_received = true;
 }
 void WaveWidget::setChunk(float limit_1high,
                           float limit_1low,

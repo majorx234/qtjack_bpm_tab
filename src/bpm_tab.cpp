@@ -56,6 +56,8 @@ BpmTab::BpmTab(QWidget *parent)
           this, &BpmTab::tab);
   connect(this, &BpmTab::on_midi_message_send,
           this, &BpmTab::midi_message_send, Qt::QueuedConnection);
+  connect(this, &BpmTab::on_midi_message_send,
+          wave_widget, &WaveWidget::setBeat, Qt::QueuedConnection);
   connect(this, &BpmTab::on_limits_ready, 
           wave_widget, &WaveWidget::setChunk);
   connect(this, &BpmTab::on_buffer_ready_to_calc_bpm, 

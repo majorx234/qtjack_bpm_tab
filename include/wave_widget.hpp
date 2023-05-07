@@ -35,6 +35,7 @@ class WaveWidget : public QWidget
   ~WaveWidget();
 
  public slots:
+  void setBeat();
   void setChunk(float limit_1high,
                 float limit_1low,
                 float limit_2high,
@@ -42,10 +43,12 @@ class WaveWidget : public QWidget
   void testChunk();
 
  private:
+  bool *beats_;
   double *wave_[4];
   int wave_ofs_;
   int wavecounter_;
   int frame_rate;
+  bool beat_received;
 
  protected:
   virtual void paintEvent(QPaintEvent*) override;
